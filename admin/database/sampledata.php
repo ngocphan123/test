@@ -30,8 +30,14 @@ $array_ignore_drop = array(
 );
 $array_method_update = array(
     $db_config['prefix'] . '_config' => array(
-        'key' => array('lang', 'module', 'config_name'),
-        'value' => array('config_value'),
+        'key' => array(
+            'lang',
+            'module',
+            'config_name'
+        ),
+        'value' => array(
+            'config_value'
+        ),
         'ignore' => array(
             0 => array(
                 'module' => 'global',
@@ -75,13 +81,13 @@ if ($nv_Request->isset_request('delete', 'post')) {
 // Tải về file dữ liệu
 if ($nv_Request->isset_request('downloadfile', 'get')) {
     $sample_name = nv_strtolower(nv_substr($nv_Request->get_title('sample_name', 'get', ''), 0, 50));
-
+    
     if (!file_exists($file_data_dump) or !preg_match('/^([a-z0-9]+)$/', $sample_name)) {
         nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op);
     }
-
+    
     nv_insert_logs(NV_LANG_DATA, $module_name, $lang_module['sampledata'], 'Manual Download: ' . $sample_name, $admin_info['userid']);
-
+    
     $download = new NukeViet\Files\Download($file_data_dump, NV_ROOTDIR . '/' . NV_TEMP_DIR, 'data_' . $sample_name . '.php');
     $download->download_file();
     exit();
@@ -92,7 +98,7 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
     if ($sys_info['ini_set_support']) {
         set_time_limit(0);
     }
-
+    
     $json = array(
         'next' => false,
         'nextdata' => array(),
@@ -101,13 +107,13 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
         'finish' => false,
         'reload' => false
     );
-
-    $array_request =  array();
+    
+    $array_request = array();
     $array_request['sample_name'] = nv_strtolower(nv_substr($nv_Request->get_title('sample_name', 'post', ''), 0, 50));
     $array_request['delifexists'] = $nv_Request->get_int('delifexists', 'post', 0);
     $array_request['offsettable'] = $nv_Request->get_int('offsettable', 'post', 0);
     $array_request['offsetrow'] = $nv_Request->get_int('offsetrow', 'post', 0);
-
+    
     if (empty($array_request['sample_name'])) {
         $json['message'] = $lang_module['sampledata_error_name'];
     } elseif (!preg_match('/^([a-z0-9]+)$/', $array_request['sample_name'])) {
@@ -116,11 +122,11 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
         $json['message'] = $lang_module['sampledata_error_exists'];
     } else {
         nv_insert_logs(NV_LANG_DATA, $module_name, $lang_module['sampledata'], 'Name: ' . $array_request['sample_name'], $admin_info['userid']);
-
+        
         // Quét các bảng dữ liệu
         $error = false;
         $array_tables = array();
-
+        
         if (!file_exists($file_data_tmp)) {
             $a = 0;
             $result = $db->query('SHOW TABLE STATUS LIKE ' . $db->quote($db_config['prefix'] . '_%'));
@@ -147,7 +153,7 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
         } else {
             $array_tables = unserialize(file_get_contents($file_data_tmp));
         }
-
+        
         // Kiểm tra và xuất file dump
         if (!$error) {
             if (!file_exists($file_data_dump)) {
@@ -159,14 +165,14 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
                 }
             }
         }
-
+        
         // Xuất CSDL
         if (!$error) {
             $db->query('SET SQL_QUOTE_SHOW_CREATE = 1');
             foreach ($array_tables as $table) {
                 $store_table_name = preg_replace('/^' . nv_preg_quote($db_config['prefix']) . '\_/', '" . $db_config[\'prefix\'] . "_', $table['name']);
                 $content = '';
-
+                
                 // Xóa bảng tạo lại
                 if (!in_array($table['name'], $array_ignore_drop)) {
                     $content = $db->query('SHOW CREATE TABLE ' . $table['name'])->fetchColumn(1);
@@ -177,7 +183,7 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
                     $content = "\n\$sql_create_table[] = \"DROP TABLE IF EXISTS `" . $store_table_name . "`\";\n" . $content;
                     $content = str_replace('`' . $table['name'] . '`', '`' . $store_table_name . '`', $content);
                 }
-
+                
                 // Xuất dữ liệu
                 if (!empty($table['numrow'])) {
                     $columns = array();
@@ -185,12 +191,16 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
                     foreach ($columns_array as $col) {
                         $columns[$col['field']] = preg_match('/^(\w*int|year)/', $col['type']) ? 'int' : 'txt';
                     }
-
+                    
                     $maxi = ceil($table['numrow'] / $table['limit']);
                     $from = 0;
                     $a = 0;
                     for ($i = 0; $i < $maxi; ++$i) {
-                        $db->sqlreset()->select('*')->from($table['name'])->limit($table['limit'])->offset($from);
+                        $db->sqlreset()
+                            ->select('*')
+                            ->from($table['name'])
+                            ->limit($table['limit'])
+                            ->offset($from);
                         $result = $db->query($db->sql());
                         while ($row = $result->fetch()) {
                             // Bỏ qua tài khoản có userid = 1
@@ -237,7 +247,7 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
                                     }
                                 }
                             }
-
+                            
                             if (isset($array_method_update[$table['name']])) {
                                 // Các bảng thực hiện Update
                                 $setting = $array_method_update[$table['name']];
@@ -274,7 +284,7 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
                                 $row2 = str_replace('{{NV_BASE_SITEURL}}', '" . NV_BASE_SITEURL . "', $row2);
                                 $content .= '$sql_create_table[] = "INSERT INTO `' . $store_table_name . '` (`' . implode('`, `', array_keys($columns)) . '`) VALUES (' . $row2 . ")\";\n";
                             }
-
+                            
                             ++$a;
                             if ($a >= $table['numrow']) {
                                 break;
@@ -284,7 +294,7 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
                         $from += $table['limit'];
                     }
                 }
-
+                
                 $check = file_put_contents($file_data_dump, $content, FILE_APPEND);
                 if ($check === false) {
                     $json['message'] = sprintf($lang_module['sampledata_error_writetmp'], NV_TEMP_DIR);
@@ -293,9 +303,9 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
                 }
             }
         }
-
+        
         nv_deletefile($file_data_tmp);
-
+        
         if ($error) {
             nv_deletefile($file_data_tmp);
         } else {
@@ -317,7 +327,7 @@ if ($nv_Request->isset_request('startwrite', 'get')) {
             }
         }
     }
-
+    
     $json['nextdata'] = $array_request;
     nv_jsonOutput($json);
 }
@@ -341,7 +351,7 @@ $array = array();
 foreach ($files as $file) {
     $array[] = array(
         'title' => substr(substr($file, 5), 0, -4),
-        'creattime' => nv_date('H:i d/m/Y', filemtime(NV_ROOTDIR . '/install/samples/' . $file)),
+        'creattime' => nv_date('H:i d/m/Y', filemtime(NV_ROOTDIR . '/install/samples/' . $file))
     );
 }
 

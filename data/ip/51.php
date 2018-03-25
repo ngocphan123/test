@@ -1,3 +1,8 @@
 <?php
 
-$ranges = array(855638016 => array(872415231, 'GB'));
+$ranges = array(
+    855638016 => array(
+        872415231,
+        'GB'
+    )
+);

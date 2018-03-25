@@ -8,7 +8,7 @@
  * @Createdate 2-1-2010 21:58
  */
 
-if (! defined('NV_IS_FILE_SITEINFO')) {
+if (!defined('NV_IS_FILE_SITEINFO')) {
     die('Stop!!!');
 }
 
@@ -20,19 +20,23 @@ $xtpl = new XTemplate('configuration_php.tpl', NV_ROOTDIR . '/themes/' . $global
 
 $array = phpinfo_array(4, 1);
 $caption = $lang_module['configuration_php'];
-$thead = array( $lang_module['directive'], $lang_module['local_value'], $lang_module['master_value'] );
+$thead = array(
+    $lang_module['directive'],
+    $lang_module['local_value'],
+    $lang_module['master_value']
+);
 
-if (! empty($array['PHP Core'])) {
+if (!empty($array['PHP Core'])) {
     $xtpl->assign('CAPTION', $caption);
     $xtpl->assign('THEAD0', $thead[0]);
     $xtpl->assign('THEAD1', $thead[1]);
     $xtpl->assign('THEAD2', $thead[2]);
-
+    
     $a = 0;
     foreach ($array['PHP Core'] as $key => $value) {
         $xtpl->assign('KEY', $key);
-
-        if (! is_array($value)) {
+        
+        if (!is_array($value)) {
             $xtpl->assign('VALUE', $value);
             $xtpl->parse('main.loop.if');
         } else {
@@ -40,11 +44,11 @@ if (! empty($array['PHP Core'])) {
             $xtpl->assign('VALUE1', $value[1]);
             $xtpl->parse('main.loop.else');
         }
-
+        
         $xtpl->parse('main.loop');
         ++$a;
     }
-
+    
     $xtpl->parse('main');
     $contents = $xtpl->text('main');
 }

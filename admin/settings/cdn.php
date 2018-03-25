@@ -8,7 +8,7 @@
  * @Createdate 28/10/2012, 14:51
  */
 
-if (! defined('NV_IS_FILE_SETTINGS')) {
+if (!defined('NV_IS_FILE_SETTINGS')) {
     die('Stop!!!');
 }
 
@@ -20,7 +20,16 @@ if (NV_CHECK_SESSION == $nv_Request->get_string('cdndl', 'get')) {
     $allowzip[] = $dir . '/modules/index.html';
     $allowzip[] = $dir . '/themes/index.html';
     $allowzip[] = $dir . '/' . NV_EDITORSDIR . '/index.html';
-    $dir_no_scan = array( NV_ROOTDIR . '/' . 'install', NV_ROOTDIR . '/' . NV_ADMINDIR, NV_ROOTDIR . '/' . NV_UPLOADS_DIR, NV_ROOTDIR . '/' . NV_FILES_DIR, NV_ROOTDIR . '/' . NV_LOGS_DIR, NV_ROOTDIR . '/' . NV_TEMP_DIR, NV_ROOTDIR . '/' . NV_DATADIR, NV_ROOTDIR . '/' . NV_CACHEDIR );
+    $dir_no_scan = array(
+        NV_ROOTDIR . '/' . 'install',
+        NV_ROOTDIR . '/' . NV_ADMINDIR,
+        NV_ROOTDIR . '/' . NV_UPLOADS_DIR,
+        NV_ROOTDIR . '/' . NV_FILES_DIR,
+        NV_ROOTDIR . '/' . NV_LOGS_DIR,
+        NV_ROOTDIR . '/' . NV_TEMP_DIR,
+        NV_ROOTDIR . '/' . NV_DATADIR,
+        NV_ROOTDIR . '/' . NV_CACHEDIR
+    );
     $error = array();
     //Ten thu muc luu data
     $stack[] = $dir;
@@ -36,7 +45,7 @@ if (NV_CHECK_SESSION == $nv_Request->get_string('cdndl', 'get')) {
                             $filename = $thisdir . '/' . $dircont[$i];
                             $allowzip[] = $filename;
                             $filename = dirname($filename) . '/index.html';
-                            if (! in_array($filename, $allowzip)) {
+                            if (!in_array($filename, $allowzip)) {
                                 if (file_exists($filename)) {
                                     $allowzip[] = $filename;
                                 }
@@ -46,7 +55,7 @@ if (NV_CHECK_SESSION == $nv_Request->get_string('cdndl', 'get')) {
                             $allowzip[] = $filename;
                             $css = file_get_contents($filename);
                             $filename = dirname($filename) . '/index.html';
-                            if (! in_array($filename, $allowzip)) {
+                            if (!in_array($filename, $allowzip)) {
                                 if (file_exists($filename)) {
                                     $allowzip[] = $filename;
                                 }
@@ -61,7 +70,7 @@ if (NV_CHECK_SESSION == $nv_Request->get_string('cdndl', 'get')) {
                                         if (file_exists($filename)) {
                                             $allowzip[] = $filename;
                                             $filename = dirname($filename) . '/index.html';
-                                            if (! in_array($filename, $allowzip)) {
+                                            if (!in_array($filename, $allowzip)) {
                                                 if (file_exists($filename)) {
                                                     $allowzip[] = $filename;
                                                 }
@@ -73,7 +82,7 @@ if (NV_CHECK_SESSION == $nv_Request->get_string('cdndl', 'get')) {
                                 }
                             }
                         }
-                    } elseif (is_dir($current_file) and ! in_array($current_file, $dir_no_scan)) {
+                    } elseif (is_dir($current_file) and !in_array($current_file, $dir_no_scan)) {
                         $stack[] = $current_file;
                     }
                 }
@@ -87,7 +96,7 @@ if (NV_CHECK_SESSION == $nv_Request->get_string('cdndl', 'get')) {
         $zip = new PclZip($file_src);
         $zip->add($allowzip, PCLZIP_OPT_REMOVE_PATH, NV_ROOTDIR);
         $zip->add(NV_ROOTDIR . '/themes/index.html', PCLZIP_OPT_REMOVE_PATH, NV_ROOTDIR . '/themes');
-
+        
         //Download file
         $download = new NukeViet\Files\Download($file_src, NV_ROOTDIR . '/' . NV_TEMP_DIR, 'js_css_cdn_' . date('Ymd') . '.zip');
         $download->download_file();

@@ -85,7 +85,7 @@ $sth->execute();
 
 while (list ($f_id, $f_custom_title) = $sth->fetch(3)) {
     $array_func_id[$f_id] = $f_custom_title;
-
+    
     $xtpl->assign('FUNCTION', array(
         'key' => $f_id,
         'selected' => ($func_id == $f_id) ? ' selected="selected"' : '',
@@ -132,9 +132,9 @@ while ($row = $sth->fetch()) {
         'file_name' => $row['file_name'],
         'active' => $row['active'] ? $lang_global['yes'] : $lang_global['no']
     ));
-
+    
     $numposition = $blocks_positions[$row['position']];
-
+    
     for ($i = 1; $i <= $numposition; ++$i) {
         $xtpl->assign('ORDER', array(
             'key' => $i,
@@ -142,7 +142,7 @@ while ($row = $sth->fetch()) {
         ));
         $xtpl->parse('main.loop.order');
     }
-
+    
     for ($i = 0, $count = sizeof($positions); $i < $count; ++$i) {
         $xtpl->assign('POSITION', array(
             'key' => (string) $positions[$i]->tag,
@@ -151,7 +151,7 @@ while ($row = $sth->fetch()) {
         ));
         $xtpl->parse('main.loop.position');
     }
-
+    
     $xtpl->parse('main.loop');
 }
 

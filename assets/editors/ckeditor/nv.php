@@ -22,7 +22,7 @@ if (!defined('NV_MAINFILE')) die('Stop!!!');
 function nv_aleditor($textareaname, $width = '100%', $height = '450px', $val = '', $customtoolbar = '', $path = '', $currentpath = '')
 {
     global $global_config, $module_upload, $module_data, $admin_info;
-
+    
     $return = '<textarea style="width: ' . $width . '; height:' . $height . ';" id="' . $module_data . '_' . $textareaname . '" name="' . $textareaname . '">' . $val . '</textarea>';
     if (!defined('CKEDITOR')) {
         define('CKEDITOR', true);
@@ -32,12 +32,12 @@ function nv_aleditor($textareaname, $width = '100%', $height = '450px', $val = '
     $return .= "<script type=\"text/javascript\">
 			CKEDITOR.replace( '" . $module_data . "_" . $textareaname . "', {" . (!empty($customtoolbar) ? 'toolbar : "' . $customtoolbar . '",' : '') . " width: '" . $width . "',height: '" . $height . "',";
     $return .= "contentsCss: '" . NV_BASE_SITEURL . NV_EDITORSDIR . "/ckeditor/nv.css?t=" . $global_config['timestamp'] . "',";
-
+    
     if (defined('NV_IS_ADMIN')) {
         if (empty($path) and empty($currentpath)) {
             $path = NV_UPLOADS_DIR;
             $currentpath = NV_UPLOADS_DIR;
-
+            
             if (!empty($module_upload) and file_exists(NV_UPLOADS_REAL_DIR . '/' . $module_upload . '/' . date("Y_m"))) {
                 $currentpath = NV_UPLOADS_DIR . '/' . $module_upload . '/' . date('Y_m');
                 $path = NV_UPLOADS_DIR . '/' . $module_upload;
@@ -45,15 +45,15 @@ function nv_aleditor($textareaname, $width = '100%', $height = '450px', $val = '
                 $currentpath = NV_UPLOADS_DIR . '/' . $module_upload;
             }
         }
-
+        
         if (!empty($admin_info['allow_files_type'])) {
             $return .= "filebrowserUploadUrl: '" . NV_BASE_SITEURL . NV_ADMINDIR . "/index.php?" . NV_NAME_VARIABLE . "=upload&" . NV_OP_VARIABLE . "=upload&editor=ckeditor&path=" . $currentpath . "',";
         }
-
+        
         if (in_array('images', $admin_info['allow_files_type'])) {
             $return .= "filebrowserImageUploadUrl: '" . NV_BASE_SITEURL . NV_ADMINDIR . "/index.php?" . NV_NAME_VARIABLE . "=upload&" . NV_OP_VARIABLE . "=upload&editor=ckeditor&path=" . $currentpath . "&type=image',";
         }
-
+        
         if (in_array('flash', $admin_info['allow_files_type'])) {
             $return .= "filebrowserFlashUploadUrl: '" . NV_BASE_SITEURL . NV_ADMINDIR . "/index.php?" . NV_NAME_VARIABLE . "=upload&" . NV_OP_VARIABLE . "=upload&editor=ckeditor&path=" . $currentpath . "&type=flash',";
         }
@@ -62,7 +62,7 @@ function nv_aleditor($textareaname, $width = '100%', $height = '450px', $val = '
 			 filebrowserFlashBrowseUrl: '" . NV_BASE_SITEURL . NV_ADMINDIR . "/index.php?" . NV_NAME_VARIABLE . "=upload&popup=1&type=flash&path=" . $path . "&currentpath=" . $currentpath . "'
 			";
     }
-
+    
     $return .= "});</script>";
     return $return;
 }

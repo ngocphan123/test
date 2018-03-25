@@ -48,15 +48,15 @@ $module_name = strtolower($nv_Request->get_title(NV_NAME_VARIABLE, 'post,get', $
 if (preg_match($global_config['check_module'], $module_name)) {
     $include_functions = $include_file = $include_menu = $lang_file = $mod_theme_file = '';
     $module_data = $module_file = $module_name;
-
+    
     $op = $nv_Request->get_title(NV_OP_VARIABLE, 'post,get', 'main');
-
+    
     if (empty($op) or $op == 'functions') {
         $op = 'main';
     } elseif (!preg_match('/^[a-z0-9\-\_\/\+]+$/i', $op)) {
         nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name);
     }
-
+    
     $site_mods = nv_site_mods();
     if (empty($site_mods) and $module_name != 'language') {
         $sql = "SELECT setup FROM " . $db_config['prefix'] . "_setup_language WHERE lang='" . NV_LANG_DATA . "'";
@@ -69,17 +69,17 @@ if (preg_match($global_config['check_module'], $module_name)) {
     if (isset($admin_mods['database']) and !(defined('NV_IS_GODADMIN') or (defined('NV_IS_SPADMIN') and $global_config['idsite'] > 0))) {
         unset($admin_mods['database']);
     }
-
+    
     if (isset($site_mods[$module_name])) {
         $module_info = $site_mods[$module_name];
         $module_file = $module_info['module_file'];
         $module_data = $module_info['module_data'];
         $module_upload = $module_info['module_upload'];
-
+        
         $include_functions = NV_ROOTDIR . '/modules/' . $module_file . '/admin.functions.php';
         $include_menu = NV_ROOTDIR . '/modules/' . $module_file . '/admin.menu.php';
         $include_file = NV_ROOTDIR . '/modules/' . $module_file . '/admin/' . $op . '.php';
-
+        
         //Ket noi ngon ngu cua module
         if (file_exists(NV_ROOTDIR . '/modules/' . $module_file . '/language/admin_' . NV_LANG_INTERFACE . '.php')) {
             require NV_ROOTDIR . '/modules/' . $module_file . '/language/admin_' . NV_LANG_INTERFACE . '.php';
@@ -95,7 +95,7 @@ if (preg_match($global_config['check_module'], $module_name)) {
             $include_functions = NV_ROOTDIR . '/' . NV_ADMINDIR . '/' . $module_file . '/functions.php';
             $include_menu = NV_ROOTDIR . '/' . NV_ADMINDIR . '/' . $module_file . '/admin.menu.php';
             $include_file = NV_ROOTDIR . '/' . NV_ADMINDIR . '/' . $module_file . '/' . $op . '.php';
-
+            
             // Ket noi voi file ngon ngu cua module
             if (file_exists(NV_ROOTDIR . '/includes/language/' . NV_LANG_INTERFACE . '/admin_' . $module_file . '.php')) {
                 require NV_ROOTDIR . '/includes/language/' . NV_LANG_INTERFACE . '/admin_' . $module_file . '.php';
@@ -106,12 +106,12 @@ if (preg_match($global_config['check_module'], $module_name)) {
             }
         }
     }
-
+    
     if (file_exists($include_functions) and file_exists($include_file)) {
         define('NV_IS_MODADMIN', true);
-
+        
         $array_lang_admin = array();
-
+        
         if ($global_config['lang_multi']) {
             $_language_array = nv_scandir(NV_ROOTDIR . '/includes/language', '/^[a-z]{2}$/');
             foreach ($_language_array as $lang_i) {
@@ -120,10 +120,10 @@ if (preg_match($global_config['check_module'], $module_name)) {
                 }
             }
         }
-
+        
         //ket noi voi giao dien chung cua admin
         require NV_ROOTDIR . '/themes/' . $global_config['admin_theme'] . '/theme.php';
-
+        
         // Ket noi giao dien cua module
         $global_config['module_theme'] = '';
         if (is_dir(NV_ROOTDIR . '/themes/' . $global_config['admin_theme'] . '/modules/' . $module_file)) {
@@ -131,15 +131,15 @@ if (preg_match($global_config['check_module'], $module_name)) {
         } elseif (is_dir(NV_ROOTDIR . '/themes/admin_default/modules/' . $module_file)) {
             $global_config['module_theme'] = 'admin_default';
         }
-
+        
         $allow_func = array();
         //Ket noi menu cua module
         if (file_exists($include_menu)) {
             require $include_menu;
         }
-
+        
         require $include_functions;
-
+        
         if (is_dir(NV_ROOTDIR . '/modules/' . $module_file . '/plugin/')) {
             // Kết nối với các Plugin
             $plugin_filename = scandir(NV_ROOTDIR . '/modules/' . $module_file . '/plugin/');
@@ -157,7 +157,7 @@ if (preg_match($global_config['check_module'], $module_name)) {
                 }
             }
         }
-
+        
         if (in_array($op, $allow_func)) {
             $admin_menu_mods = array();
             if (!empty($menu_top) and !empty($submenu)) {
@@ -179,7 +179,7 @@ if (preg_match($global_config['check_module'], $module_name)) {
         $sth = $db->prepare('UPDATE ' . NV_MODULES_TABLE . ' SET admin_file=0 WHERE title= :module_name');
         $sth->bindParam(':module_name', $module_name, PDO::PARAM_STR);
         $sth->execute();
-
+        
         $nv_Cache->delMod('modules');
     }
 }

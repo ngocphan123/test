@@ -44,13 +44,13 @@ function nv_siteinfo_getlang()
     $sql = 'SELECT DISTINCT lang FROM ' . $db_config['prefix'] . '_logs';
     $result = $nv_Cache->db($sql, 'lang', 'siteinfo');
     $array_lang = array();
-
+    
     if (!empty($result)) {
         foreach ($result as $row) {
             $array_lang[] = $row['lang'];
         }
     }
-
+    
     return $array_lang;
 }
 
@@ -65,7 +65,7 @@ function nv_siteinfo_getuser()
     $sql = 'SELECT userid, username FROM ' . NV_USERS_GLOBALTABLE . ' WHERE userid IN ( SELECT DISTINCT userid FROM ' . $db_config['prefix'] . '_logs WHERE userid!=0 ) ORDER BY username ASC';
     $result = $nv_Cache->db($sql, 'userid', 'siteinfo');
     $array_user = array();
-
+    
     if (!empty($result)) {
         foreach ($result as $row) {
             $array_user[] = array(
@@ -74,7 +74,7 @@ function nv_siteinfo_getuser()
             );
         }
     }
-
+    
     return $array_user;
 }
 
@@ -89,13 +89,13 @@ function nv_siteinfo_getmodules()
     $sql = 'SELECT DISTINCT module_name FROM ' . $db_config['prefix'] . '_logs';
     $result = $nv_Cache->db($sql, 'module_name', 'siteinfo');
     $array_modules = array();
-
+    
     if (!empty($result)) {
         foreach ($result as $row) {
             $array_modules[] = $row['module_name'];
         }
     }
-
+    
     return $array_modules;
 }
 
@@ -108,9 +108,9 @@ function nv_siteinfo_getmodules()
 function nv_get_lang_module($mod)
 {
     global $site_mods;
-
+    
     $lang_module = array();
-
+    
     if (isset($site_mods[$mod])) {
         if (file_exists(NV_ROOTDIR . '/modules/' . $site_mods[$mod]['module_file'] . '/language/admin_' . NV_LANG_INTERFACE . '.php')) {
             include NV_ROOTDIR . '/modules/' . $site_mods[$mod]['module_file'] . '/language/admin_' . NV_LANG_INTERFACE . '.php';

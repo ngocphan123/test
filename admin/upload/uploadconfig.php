@@ -15,22 +15,30 @@ if (!defined('NV_ADMIN') or !defined('NV_MAINFILE') or !defined('NV_IS_MODADMIN'
 $ini = nv_parse_ini_file(NV_ROOTDIR . '/includes/ini/mime.ini', true);
 
 $myini = array(
-    'types' => array(''),
-    'exts' => array(''),
-    'mimes' => array('')
+    'types' => array(
+        ''
+    ),
+    'exts' => array(
+        ''
+    ),
+    'mimes' => array(
+        ''
+    )
 );
 
 foreach ($ini as $type => $extmime) {
     $myini['types'][] = $type;
     $myini['exts'] = array_merge($myini['exts'], array_keys($extmime));
     $m = array_values($extmime);
-
+    
     if (is_string($m)) {
         $myini['mimes'] = array_merge($myini['mimes'], $m);
     } else {
         foreach ($m as $m2) {
             if (!is_array($m2)) {
-                $m2 = array($m2);
+                $m2 = array(
+                    $m2
+                );
             }
             $myini['mimes'] = array_merge($myini['mimes'], $m2);
         }
@@ -52,7 +60,7 @@ if ($nv_Request->isset_request('submit', 'post')) {
     $type = array_flip($type);
     $type = array_intersect_key($myini['types'], $type);
     $type = implode(',', $type);
-
+    
     $ext = $nv_Request->get_typed_array('ext', 'post', 'int');
     $ext = array_flip($ext);
     $ext = array_intersect_key($myini['exts'], $ext);
@@ -64,21 +72,21 @@ if ($nv_Request->isset_request('submit', 'post')) {
     $ext[] = 'inc';
     $ext = array_unique($ext);
     $ext = implode(',', $ext);
-
+    
     $mime = $nv_Request->get_typed_array('mime', 'post', 'int');
     $mime = array_flip($mime);
     $mime = array_intersect_key($myini['mimes'], $mime);
     $mime = implode(',', $mime);
-
+    
     $upload_checking_mode = $nv_Request->get_string('upload_checking_mode', 'post', '');
     if ($upload_checking_mode != 'mild' and $upload_checking_mode != 'lite' and $upload_checking_mode != 'strong') {
         $upload_checking_mode = 'none';
     }
-
+    
     $nv_max_size = $nv_Request->get_float('nv_max_size', 'post', $global_config['nv_max_size']);
     $nv_max_size = min(nv_converttoBytes(ini_get('upload_max_filesize')), nv_converttoBytes(ini_get('post_max_size')), $nv_max_size);
-    $nv_auto_resize = (int)$nv_Request->get_bool('nv_auto_resize', 'post', 0);
-
+    $nv_auto_resize = (int) $nv_Request->get_bool('nv_auto_resize', 'post', 0);
+    
     $upload_chunk_size = $nv_Request->get_float('upload_chunk_size', 'post', 0);
     $upload_chunk_size_text = $nv_Request->get_title('upload_chunk_size_text', 'post', '');
     if ($upload_chunk_size_text == 'MB') {
@@ -92,61 +100,61 @@ if ($nv_Request->isset_request('submit', 'post')) {
     if ($upload_chunk_size > $nv_max_size or $upload_chunk_size < 0) {
         $upload_chunk_size = 0;
     }
-
+    
     $sth = $db->prepare("UPDATE " . NV_CONFIG_GLOBALTABLE . " SET config_value = :config_value WHERE lang = 'sys' AND module = 'global' AND config_name = :config_name");
     $sth->bindValue(':config_name', 'file_allowed_ext', PDO::PARAM_STR);
     $sth->bindValue(':config_value', $type, PDO::PARAM_STR);
     $sth->execute();
-
+    
     $sth->bindValue(':config_name', 'forbid_extensions', PDO::PARAM_STR);
     $sth->bindValue(':config_value', $ext, PDO::PARAM_STR);
     $sth->execute();
-
+    
     $sth->bindValue(':config_name', 'forbid_mimes', PDO::PARAM_STR);
     $sth->bindValue(':config_value', $mime, PDO::PARAM_STR);
     $sth->execute();
-
+    
     $sth->bindValue(':config_name', 'nv_auto_resize', PDO::PARAM_STR);
     $sth->bindValue(':config_value', $nv_auto_resize, PDO::PARAM_STR);
     $sth->execute();
-
+    
     $sth->bindValue(':config_name', 'nv_max_size', PDO::PARAM_STR);
     $sth->bindValue(':config_value', $nv_max_size, PDO::PARAM_STR);
     $sth->execute();
-
+    
     $sth->bindValue(':config_name', 'upload_checking_mode', PDO::PARAM_STR);
     $sth->bindValue(':config_value', $upload_checking_mode, PDO::PARAM_STR);
     $sth->execute();
-
+    
     $sth->bindValue(':config_name', 'upload_chunk_size', PDO::PARAM_STR);
     $sth->bindValue(':config_value', $upload_chunk_size, PDO::PARAM_STR);
     $sth->execute();
-
+    
     $array_config_define = array();
-    $array_config_define['upload_alt_require'] = (int)$nv_Request->get_bool('upload_alt_require', 'post', 0);
-    $array_config_define['upload_auto_alt'] = (int)$nv_Request->get_bool('upload_auto_alt', 'post', 0);
-
+    $array_config_define['upload_alt_require'] = (int) $nv_Request->get_bool('upload_alt_require', 'post', 0);
+    $array_config_define['upload_auto_alt'] = (int) $nv_Request->get_bool('upload_auto_alt', 'post', 0);
+    
     $sth->bindValue(':config_name', 'upload_alt_require', PDO::PARAM_STR);
     $sth->bindValue(':config_value', $array_config_define['upload_alt_require'], PDO::PARAM_STR);
     $sth->execute();
-
+    
     $sth->bindValue(':config_name', 'upload_auto_alt', PDO::PARAM_STR);
     $sth->bindValue(':config_value', $array_config_define['upload_auto_alt'], PDO::PARAM_STR);
     $sth->execute();
-
+    
     $array_config_define = array();
     $array_config_define['nv_max_width'] = $nv_Request->get_int('nv_max_width', 'post');
     $array_config_define['nv_max_height'] = $nv_Request->get_int('nv_max_height', 'post');
-
+    
     $sth = $db->prepare("UPDATE " . NV_CONFIG_GLOBALTABLE . " SET config_value = :config_value WHERE lang = 'sys' AND module = 'define' AND config_name = :config_name");
     foreach ($array_config_define as $config_name => $config_value) {
         $sth->bindParam(':config_name', $config_name, PDO::PARAM_STR, 30);
         $sth->bindParam(':config_value', $config_value, PDO::PARAM_STR);
         $sth->execute();
     }
-
+    
     nv_save_file_config_global();
-
+    
     nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op . '&rand=' . nv_genpass());
 }
 
@@ -172,13 +180,13 @@ $xtpl->assign('UPLOAD_AUTO_ALT', ($global_config['upload_auto_alt']) ? ' checked
 
 for ($index = 100; $index > 0; --$index) {
     $size = floor($index * $p_size);
-
+    
     $xtpl->assign('SIZE', array(
         'key' => $size,
         'title' => nv_convertfromBytes($size),
         'selected' => ($size == $global_config['nv_max_size']) ? ' selected="selected"' : ''
     ));
-
+    
     $xtpl->parse('main.size');
 }
 
@@ -218,7 +226,10 @@ if ($global_config['upload_chunk_size'] > 1048575) {
 }
 
 $xtpl->assign('UPLOAD_CHUNK_SIZE', $upload_chunk_size);
-$array_chunk_size = array('KB', 'MB');
+$array_chunk_size = array(
+    'KB',
+    'MB'
+);
 foreach ($array_chunk_size as $chunk_size) {
     $chunk_size_lev = array(
         'key' => $chunk_size,

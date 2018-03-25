@@ -8,7 +8,7 @@
  * @Createdate 2-2-2010 12:55
  */
 
-if (! defined('NV_IS_FILE_WEBTOOLS')) {
+if (!defined('NV_IS_FILE_WEBTOOLS')) {
     die('Stop!!!');
 }
 
@@ -19,30 +19,30 @@ $array_config_global = array();
 if ($nv_Request->isset_request('submit', 'post')) {
     $array_config_global['online_upd'] = $nv_Request->get_int('online_upd', 'post');
     $array_config_global['statistic'] = $nv_Request->get_int('statistic', 'post');
-
+    
     $statistics_timezone = nv_substr($nv_Request->get_title('statistics_timezone', 'post', '', 0), 0, 255);
-
-    if (! empty($statistics_timezone) and in_array($statistics_timezone, $timezone_array)) {
+    
+    if (!empty($statistics_timezone) and in_array($statistics_timezone, $timezone_array)) {
         $array_config_global['statistics_timezone'] = $statistics_timezone;
     } else {
         $array_config_global['statistics_timezone'] = NV_SITE_TIMEZONE_NAME;
     }
-
+    
     $array_config_global['googleAnalyticsID'] = nv_substr($nv_Request->get_title('googleAnalyticsID', 'post', '', 1), 0, 20);
-
-    if (! preg_match('/^UA-\d{4,}-\d+$/', $array_config_global['googleAnalyticsID'])) {
+    
+    if (!preg_match('/^UA-\d{4,}-\d+$/', $array_config_global['googleAnalyticsID'])) {
         $array_config_global['googleAnalyticsID'] = '';
     }
-
+    
     $sth = $db->prepare("UPDATE " . NV_CONFIG_GLOBALTABLE . " SET config_value = :config_value WHERE lang = 'sys' AND module = 'site' AND config_name = :config_name");
     foreach ($array_config_global as $config_name => $config_value) {
         $sth->bindParam(':config_name', $config_name, PDO::PARAM_STR);
         $sth->bindParam(':config_value', $config_value, PDO::PARAM_STR);
         $sth->execute();
     }
-
+    
     $nv_Cache->delAll(false);
-
+    
     nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op . '&rand=' . nv_genpass());
 }
 

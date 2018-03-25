@@ -34,7 +34,7 @@ $errorconfig = array();
 $array_site_theme = array();
 $array_site_cat_theme = array();
 $result = $db->query('SELECT DISTINCT theme FROM ' . NV_PREFIXLANG . '_modthemes WHERE func_id=0');
-while (list($theme) = $result->fetch(3)) {
+while (list ($theme) = $result->fetch(3)) {
     $array_site_theme[] = $theme;
 }
 if ($global_config['idsite']) {
@@ -85,9 +85,9 @@ foreach ($theme_list as $value) {
     if ($global_config['idsite'] and !in_array($value, $array_site_cat_theme)) {
         continue;
     }
-
+    
     $info = $xml->xpath('info');
-
+    
     if ($global_config['site_theme'] == $value) {
         $xtpl->assign('THEME_ACTIVE', ' active');
         $xtpl->assign('BTN_ACTIVE', 'default');
@@ -95,26 +95,26 @@ foreach ($theme_list as $value) {
         $xtpl->assign('THEME_ACTIVE', '');
         $xtpl->assign('BTN_ACTIVE', 'primary');
     }
-
+    
     $xtpl->assign('ROW', array(
-        'name' => (string)$info[0]->name,
-        'website' => (string)$info[0]->website,
-        'author' => (string)$info[0]->author,
-        'thumbnail' => (string)$info[0]->thumbnail,
-        'description' => (string)$info[0]->description,
+        'name' => (string) $info[0]->name,
+        'website' => (string) $info[0]->website,
+        'author' => (string) $info[0]->author,
+        'thumbnail' => (string) $info[0]->thumbnail,
+        'description' => (string) $info[0]->description,
         'value' => $value
     ));
-
+    
     $position = $xml->xpath('positions');
     $positions = $position[0]->position;
     $pos = array();
-
+    
     for ($j = 0, $count = sizeof($positions); $j < $count; ++$j) {
         $pos[] = $positions[$j]->name;
     }
-
+    
     $xtpl->assign('POSITION', implode('</code> <code>', $pos));
-
+    
     $actions = 0;
     if ($global_config['site_theme'] != $value) {
         $allow_preview = false;
@@ -132,8 +132,7 @@ foreach ($theme_list as $value) {
             $xtpl->parse('main.loop.actions.link_setting');
             $actions++;
         }
-
-
+        
         if ($allow_preview) {
             if (in_array($value, $array_allow_preview)) {
                 $xtpl->assign('SHOW_PREVIEW1', '');
@@ -146,15 +145,15 @@ foreach ($theme_list as $value) {
                 $xtpl->assign('TEXT_PREVIEW', $lang_module['preview_theme_on']);
                 $xtpl->assign('LINK_PREVIEW', '');
             }
-
+            
             $xtpl->parse('main.loop.preview');
         }
     }
-
+    
     if ($actions > 0) {
         $xtpl->parse('main.loop.actions');
     }
-
+    
     $xtpl->parse('main.loop');
 }
 

@@ -8,7 +8,7 @@
  * @Createdate 2-9-2010 14:43
  */
 
-if (! defined('NV_IS_FILE_SEOTOOLS')) {
+if (!defined('NV_IS_FILE_SEOTOOLS')) {
     die('Stop!!!');
 }
 
@@ -16,19 +16,19 @@ $page_title = $lang_module['googleplus_page_title'];
 
 // Sua
 if ($nv_Request->isset_request('edit', 'post')) {
-    if (! defined('NV_IS_AJAX')) {
+    if (!defined('NV_IS_AJAX')) {
         die('Wrong URL');
     }
-
+    
     $gid = $nv_Request->get_int('gid', 'post', 0);
     $title = $nv_Request->get_title('title', 'post', '', 1);
-
+    
     if (empty($title)) {
         die('NO');
     }
     $sth = $db->prepare('UPDATE ' . $db_config['prefix'] . '_googleplus SET title = :title, edit_time=' . NV_CURRENTTIME . ' WHERE gid=' . $gid);
     $sth->bindParam(':title', $title, PDO::PARAM_STR);
-    if (! $sth->execute()) {
+    if (!$sth->execute()) {
         die('NO');
     }
     die('OK');
@@ -36,17 +36,17 @@ if ($nv_Request->isset_request('edit', 'post')) {
 
 // Them
 if ($nv_Request->isset_request('add', 'post')) {
-    if (! defined('NV_IS_AJAX')) {
+    if (!defined('NV_IS_AJAX')) {
         die('Wrong URL');
     }
-
+    
     $title = $nv_Request->get_title('title', 'post', '', 1);
     $idprofile = $nv_Request->get_title('idprofile', 'post', '', 1);
-
+    
     if (empty($title)) {
         die('NO');
     }
-
+    
     $weight = $db->query('SELECT MAX(weight) FROM ' . $db_config['prefix'] . '_googleplus')->fetchColumn();
     $weight = intval($weight) + 1;
     try {
@@ -56,25 +56,25 @@ if ($nv_Request->isset_request('add', 'post')) {
     } catch (PDOException $e) {
         die('NO');
     }
-
+    
     $nv_Cache->delMod('seotools');
     die('OK');
 }
 
 // Chinh thu tu
 if ($nv_Request->isset_request('changeweight', 'post')) {
-    if (! defined('NV_IS_AJAX')) {
+    if (!defined('NV_IS_AJAX')) {
         die('Wrong URL');
     }
-
+    
     $gid = $nv_Request->get_int('gid', 'post', 0);
     $new_vid = $nv_Request->get_int('new_vid', 'post', 0);
-
+    
     $numrows = $db->query('SELECT COUNT(*) FROM ' . $db_config['prefix'] . '_googleplus WHERE gid=' . $gid)->fetchColumn();
     if ($numrows != 1) {
         die('NO');
     }
-
+    
     $query = 'SELECT gid FROM ' . $db_config['prefix'] . '_googleplus WHERE gid!=' . $gid . ' ORDER BY weight ASC';
     $result = $db->query($query);
     $weight = 0;
@@ -91,18 +91,18 @@ if ($nv_Request->isset_request('changeweight', 'post')) {
 
 // Xoa
 if ($nv_Request->isset_request('del', 'post')) {
-    if (! defined('NV_IS_AJAX')) {
+    if (!defined('NV_IS_AJAX')) {
         die('Wrong URL');
     }
-
+    
     $gid = $nv_Request->get_int('gid', 'post', 0);
-
+    
     $gid = $db->query('SELECT gid FROM ' . $db_config['prefix'] . '_googleplus WHERE gid=' . $gid)->fetchColumn();
-
+    
     if ($gid) {
         $db->query('UPDATE ' . NV_MODULES_TABLE . ' SET gid=0 WHERE gid=' . $gid);
         $nv_Cache->delMod('modules');
-
+        
         $query = 'DELETE FROM ' . $db_config['prefix'] . '_googleplus WHERE gid=' . $gid;
         if ($db->exec($query)) {
             // fix weight question
@@ -122,22 +122,22 @@ if ($nv_Request->isset_request('del', 'post')) {
 
 // Change for module
 if ($nv_Request->isset_request('changemod', 'post')) {
-    if (! defined('NV_IS_AJAX')) {
+    if (!defined('NV_IS_AJAX')) {
         die('Wrong URL');
     }
-
+    
     $title = $nv_Request->get_title('changemod', 'post', 0);
-
-    if (! isset($site_mods[$title])) {
+    
+    if (!isset($site_mods[$title])) {
         die('NO');
     }
-
+    
     $gid = $nv_Request->get_int('gid', 'post', 0);
-
+    
     $sth = $db->prepare('UPDATE ' . NV_MODULES_TABLE . ' SET gid=' . $gid . ' WHERE title= :title');
     $sth->bindParam(':title', $title, PDO::PARAM_STR);
     $sth->execute();
-
+    
     $nv_Cache->delMod('modules');
     die('OK');
 }
@@ -147,24 +147,24 @@ $xtpl->assign('GLANG', $lang_global);
 
 // Danh sach
 if ($nv_Request->isset_request('qlist', 'post')) {
-    if (! defined('NV_IS_AJAX')) {
+    if (!defined('NV_IS_AJAX')) {
         die('Wrong URL');
     }
-
+    
     $array_googleplus = array();
     $result = $db->query('SELECT * FROM ' . $db_config['prefix'] . '_googleplus ORDER BY weight ASC');
     while ($row = $result->fetch()) {
         $array_googleplus[$row['gid']] = $row;
     }
     $numgoogleplus = sizeof($array_googleplus);
-
+    
     if ($numgoogleplus) {
         $number = 0;
         foreach ($site_mods as $title => $row) {
             $row['title'] = $title;
             $row['number'] = ++$number;
             $xtpl->assign('ROW', $row);
-
+            
             foreach ($array_googleplus as $gid => $grow) {
                 $grow['selected'] = ($gid == $row['gid']) ? ' selected="selected"' : '';
                 $xtpl->assign('GOOGLEPLUS', $grow);
@@ -180,7 +180,7 @@ if ($nv_Request->isset_request('qlist', 'post')) {
             'idprofile' => $row['idprofile'],
             'title' => $row['title']
         ));
-
+        
         for ($i = 1; $i <= $numgoogleplus; ++$i) {
             $xtpl->assign('WEIGHT', array(
                 'key' => $i,
@@ -189,7 +189,7 @@ if ($nv_Request->isset_request('qlist', 'post')) {
             ));
             $xtpl->parse('main.googleplus.weight');
         }
-
+        
         $xtpl->parse('main.googleplus');
     }
     $xtpl->parse('main');

@@ -28,34 +28,34 @@ $setmodule = $nv_Request->get_title('setmodule', 'get', '', 1);
 if (!empty($setmodule) and preg_match($global_config['check_module'], $setmodule)) {
     if ($nv_Request->get_title('checkss', 'get') == md5('setmodule' . $setmodule . NV_CHECK_SESSION)) {
         $sample = $nv_Request->get_int('sample', 'get', 0);
-
+        
         $sth = $db->prepare('SELECT basename, table_prefix FROM ' . $db_config['prefix'] . '_setup_extensions WHERE title=:title AND type=\'module\'');
         $sth->bindParam(':title', $setmodule, PDO::PARAM_STR);
         $sth->execute();
         $modrow = $sth->fetch();
-
+        
         if (!empty($modrow)) {
             if (!empty($array_site_cat_module) and !in_array($modrow['basename'], $array_site_cat_module)) {
                 nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op);
             }
-
+            
             $weight = $db->query('SELECT MAX(weight) FROM ' . NV_MODULES_TABLE)->fetchColumn();
             $weight = intval($weight) + 1;
-
+            
             $module_version = array();
             $custom_title = preg_replace('/(\W+)/i', ' ', $setmodule);
             $version_file = NV_ROOTDIR . '/modules/' . $modrow['basename'] . '/version.php';
-
+            
             if (file_exists($version_file)) {
                 include $version_file;
                 if ($setmodule == $modrow['basename'] and isset($module_version['name'])) {
                     $custom_title = $module_version['name'];
                 }
             }
-
+            
             $admin_file = (file_exists(NV_ROOTDIR . '/modules/' . $modrow['basename'] . '/admin.functions.php') and file_exists(NV_ROOTDIR . '/modules/' . $modrow['basename'] . '/admin/main.php')) ? 1 : 0;
             $main_file = (file_exists(NV_ROOTDIR . '/modules/' . $modrow['basename'] . '/functions.php') and file_exists(NV_ROOTDIR . '/modules/' . $modrow['basename'] . '/funcs/main.php')) ? 1 : 0;
-
+            
             try {
                 $sth = $db->prepare("INSERT INTO " . NV_MODULES_TABLE . "
 					(title, module_file, module_data, module_upload, module_theme, custom_title, admin_title, set_time, main_file, admin_file, theme, mobile, description, keywords, groups_view, weight, act, admins, rss, sitemap) VALUES
@@ -71,22 +71,22 @@ if (!empty($setmodule) and preg_match($global_config['check_module'], $setmodule
             } catch (PDOException $e) {
                 trigger_error($e->getMessage());
             }
-
+            
             $nv_Cache->delMod('modules');
             $return = nv_setup_data_module(NV_LANG_DATA, $setmodule, $sample);
             if ($return == 'OK_' . $setmodule) {
                 nv_setup_block_module($setmodule);
-
+                
                 $sth = $db->prepare('UPDATE ' . NV_MODULES_TABLE . ' SET act=1 WHERE title=:title');
                 $sth->bindParam(':title', $setmodule, PDO::PARAM_STR);
                 $sth->execute();
-
+                
                 nv_insert_logs(NV_LANG_DATA, $module_name, $lang_module['modules'] . ' ' . $setmodule, '', $admin_info['userid']);
                 nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=edit&mod=' . $setmodule);
             }
         }
     }
-
+    
     nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op);
 }
 
@@ -106,11 +106,11 @@ while ($row = $result->fetch()) {
         $sth = $db->prepare('DELETE FROM ' . $db_config['prefix'] . '_setup_extensions WHERE title= :title AND type=\'module\'');
         $sth->bindParam(':title', $row['title'], PDO::PARAM_STR);
         $sth->execute();
-
+        
         $sth = $db->prepare('UPDATE ' . NV_MODULES_TABLE . ' SET act=2 WHERE title=:title');
         $sth->bindParam(':title', $row['title'], PDO::PARAM_STR);
         $sth->execute();
-
+        
         $is_delCache = true;
     }
 }
@@ -125,20 +125,20 @@ $arr_module_news = array_diff_key($modules_exit, $modules_data);
 foreach ($arr_module_news as $module_name_i => $arr) {
     $check_file_main = NV_ROOTDIR . '/modules/' . $module_name_i . '/funcs/main.php';
     $check_file_functions = NV_ROOTDIR . '/modules/' . $module_name_i . '/functions.php';
-
+    
     $check_admin_main = NV_ROOTDIR . '/modules/' . $module_name_i . '/admin/main.php';
     $check_admin_functions = NV_ROOTDIR . '/modules/' . $module_name_i . '/admin.functions.php';
-
+    
     if ((file_exists($check_file_main) and filesize($check_file_main) != 0 and file_exists($check_file_functions) and filesize($check_file_functions) != 0) or (file_exists($check_admin_main) and filesize($check_admin_main) != 0 and file_exists($check_admin_functions) and filesize($check_admin_functions) != 0)) {
         $check_addnews_modules = true;
-
+        
         $module_version = array();
         $version_file = NV_ROOTDIR . '/modules/' . $module_name_i . '/version.php';
-
+        
         if (file_exists($version_file)) {
             require_once $version_file;
         }
-
+        
         if (empty($module_version)) {
             $timestamp = NV_CURRENTTIME - date('Z', NV_CURRENTTIME);
             $module_version = array(
@@ -152,24 +152,24 @@ foreach ($arr_module_news as $module_name_i => $arr) {
                 'note' => ''
             );
         }
-
+        
         $date_ver = intval(strtotime($module_version['date']));
-
+        
         if ($date_ver == 0) {
             $date_ver = NV_CURRENTTIME;
         }
-
+        
         $version = $module_version['version'] . ' ' . $date_ver;
         $note = $module_version['note'];
         $author = $module_version['author'];
         $module_data = preg_replace('/(\W+)/i', '_', $module_name_i);
-
+        
         // Chỉ cho phép ảo hóa module khi virtual = 1, Khi virtual = 2, chỉ đổi được tên các func
         $module_version['virtual'] = ($module_version['virtual'] == 1) ? 1 : 0;
-
+        
         $sth = $db->prepare('INSERT INTO ' . $db_config['prefix'] . '_setup_extensions (type, title, is_sys, is_virtual, basename, table_prefix, version, addtime, author, note) VALUES (
 			\'module\', :title, ' . intval($module_version['is_sysmod']) . ', ' . intval($module_version['virtual']) . ', :basename, :table_prefix, :version, ' . NV_CURRENTTIME . ', :author, :note)');
-
+        
         $sth->bindParam(':title', $module_name_i, PDO::PARAM_STR);
         $sth->bindParam(':basename', $module_name_i, PDO::PARAM_STR);
         $sth->bindParam(':table_prefix', $module_data, PDO::PARAM_STR);
@@ -209,7 +209,7 @@ foreach ($modules_data as $row) {
         if (!empty($array_site_cat_module) and !in_array($row['basename'], $array_site_cat_module)) {
             continue;
         }
-
+        
         if (array_key_exists($row['title'], $news_modules_for_file)) {
             $mod = array();
             $mod['title'] = $row['title'];
@@ -221,10 +221,10 @@ foreach ($modules_data as $row) {
             $mod['author'] = $row['author'];
             $mod['note'] = $row['note'];
             $mod['url_setup'] = array_key_exists($row['title'], $modules_for_title) ? '' : NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=' . $op . '&amp;setmodule=' . $row['title'] . '&amp;checkss=' . md5('setmodule' . $row['title'] . NV_CHECK_SESSION);
-
+            
             if ($mod['module_file'] == $mod['title']) {
                 $array_modules[] = $mod;
-
+                
                 if ($row['is_virtual']) {
                     $mod_virtual[] = $mod['title'];
                 }

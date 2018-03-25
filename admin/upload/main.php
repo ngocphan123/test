@@ -8,7 +8,7 @@
  * @Createdate 2-9-2010 14:43
  */
 
-if (! defined('NV_IS_FILE_ADMIN')) {
+if (!defined('NV_IS_FILE_ADMIN')) {
     die('Stop!!!');
 }
 
@@ -35,7 +35,7 @@ $xtpl = new XTemplate('main.tpl', NV_ROOTDIR . '/themes/' . $global_config['modu
 if ($popup) {
     $lang_module['browse_file'] = $lang_global['browse_file'];
     $sys_max_size = min($global_config['nv_max_size'], nv_converttoBytes(ini_get('upload_max_filesize')), nv_converttoBytes(ini_get('post_max_size')));
-
+    
     $xtpl->assign('NV_MY_DOMAIN', NV_MY_DOMAIN);
     $xtpl->assign('NV_BASE_SITEURL', NV_BASE_SITEURL);
     $xtpl->assign('ADMIN_THEME', $global_config['module_theme']);
@@ -57,53 +57,57 @@ if ($popup) {
     $xtpl->assign('ALT', $alt);
     $xtpl->assign('FUNNUM', $nv_Request->get_int('CKEditorFuncNum', 'get', 0));
     $xtpl->assign('NV_CHUNK_SIZE', $global_config['upload_chunk_size']);
-
+    
     $sfile = ($type == 'file') ? ' selected="selected"' : '';
     $simage = ($type == 'image') ? ' selected="selected"' : '';
     $sflash = ($type == 'flash') ? ' selected="selected"' : '';
-
+    
     $xtpl->assign('SFLASH', $sflash);
     $xtpl->assign('SIMAGE', $simage);
     $xtpl->assign('SFILE', $sfile);
-
+    
     // Find logo config
     $upload_logo = $upload_logo_config = '';
-    if (! empty($global_config['upload_logo']) and file_exists(NV_ROOTDIR . '/' . $global_config['upload_logo'])) {
+    if (!empty($global_config['upload_logo']) and file_exists(NV_ROOTDIR . '/' . $global_config['upload_logo'])) {
         $upload_logo = NV_BASE_SITEURL . $global_config['upload_logo'];
         $logo_size = getimagesize(NV_ROOTDIR . '/' . $global_config['upload_logo']);
         $upload_logo_config = $logo_size[0] . '|' . $logo_size[1] . '|' . $global_config['autologosize1'] . '|' . $global_config['autologosize2'] . '|' . $global_config['autologosize3'];
     }
-
+    
     $xtpl->assign('UPLOAD_LOGO', $upload_logo);
     $xtpl->assign('UPLOAD_LOGO_CONFIG', $upload_logo_config);
-
+    
     // Check upload allow file types
     if ($type == 'image' and in_array('images', $admin_info['allow_files_type'])) {
-        $allow_files_type = array( 'images' );
+        $allow_files_type = array(
+            'images'
+        );
     } elseif ($type == 'flash' and in_array('flash', $admin_info['allow_files_type'])) {
-        $allow_files_type = array( 'flash' );
+        $allow_files_type = array(
+            'flash'
+        );
     } else {
         $allow_files_type = $admin_info['allow_files_type'];
     }
-
-    $xtpl->assign('UPLOAD_ALT_REQUIRE', ! empty($global_config['upload_alt_require']) ? 'true' : 'false');
-    $xtpl->assign('UPLOAD_AUTO_ALT', ! empty($global_config['upload_auto_alt']) ? 'true' : 'false');
-
-    if (! empty($global_config['upload_alt_require'])) {
+    
+    $xtpl->assign('UPLOAD_ALT_REQUIRE', !empty($global_config['upload_alt_require']) ? 'true' : 'false');
+    $xtpl->assign('UPLOAD_AUTO_ALT', !empty($global_config['upload_auto_alt']) ? 'true' : 'false');
+    
+    if (!empty($global_config['upload_alt_require'])) {
         $xtpl->parse('main.alt_remote');
     }
-
-    if (! empty($global_config['upload_auto_alt'])) {
+    
+    if (!empty($global_config['upload_auto_alt'])) {
         $xtpl->parse('main.auto_alt');
     }
-
-    if (! $global_config['nv_auto_resize']) {
+    
+    if (!$global_config['nv_auto_resize']) {
         $xtpl->parse('main.no_auto_resize');
     }
-
+    
     $xtpl->parse('main');
     $contents = $xtpl->text('main');
-
+    
     $head_site = 0;
 } else {
     $xtpl->assign('IFRAME_SRC', NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;popup=1');

@@ -32,10 +32,10 @@ foreach ($columns_array as $row) {
 
 if (empty($array_lang_exit) or !in_array($dirlang, $array_lang_exit)) {
     $xtpl->assign('URL', NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=read&dirlang=' . $dirlang . '&checksess=' . md5('readallfile' . NV_CHECK_SESSION));
-
+    
     $xtpl->parse('empty');
     $contents = $xtpl->text('empty');
-
+    
     include NV_ROOTDIR . '/includes/header.php';
     echo nv_admin_theme($contents);
     include NV_ROOTDIR . '/includes/footer.php';
@@ -70,7 +70,7 @@ while (list ($idfile, $module, $admin_file, $langtype, $author_lang) = $result->
             $langsitename = $admin_file;
             break;
     }
-
+    
     if (empty($author_lang)) {
         $array_translator = array();
         $array_translator['author'] = '';
@@ -81,7 +81,7 @@ while (list ($idfile, $module, $admin_file, $langtype, $author_lang) = $result->
     } else {
         $array_translator = unserialize($author_lang);
     }
-
+    
     $xtpl->assign('ROW', array(
         'stt' => ++$a,
         'module' => preg_replace('/^theme\_(.*?)$/', 'Theme: \\1', $module),

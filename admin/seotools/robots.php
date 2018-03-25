@@ -33,20 +33,20 @@ if ($nv_Request->isset_request('submit', 'post')) {
             $robots_other[$value] = intval($optionother[$key]);
         }
     }
-
+    
     $content_config = "<?php\n\n";
     $content_config .= NV_FILEHEAD . "\n\n";
     $content_config .= "if (!defined('NV_MAINFILE'))\n    die('Stop!!!');\n\n";
     $content_config .= "\$cache = '" . serialize($robots_data) . "';\n\n";
     $content_config .= "\$cache_other = '" . serialize($robots_other) . "';\n";
-
+    
     file_put_contents($cache_file, $content_config, LOCK_EX);
-
+    
     $redirect = false;
     if (!$global_config['check_rewrite_file'] or !$global_config['rewrite_enable']) {
         $rbcontents = array();
         $rbcontents[] = 'User-agent: *';
-
+        
         foreach ($robots_data as $key => $value) {
             if ($value == 0) {
                 $rbcontents[] = 'Disallow: ' . $key;
@@ -54,11 +54,11 @@ if ($nv_Request->isset_request('submit', 'post')) {
                 $rbcontents[] = 'Allow: ' . $key;
             }
         }
-
+        
         $rbcontents[] = 'Sitemap: ' . $global_config['site_url'] . '/index.php?' . NV_NAME_VARIABLE . '=SitemapIndex' . $global_config['rewrite_endurl'];
-
+        
         $rbcontents = implode("\n", $rbcontents);
-
+        
         if (is_writable(NV_ROOTDIR . '/robots.txt')) {
             file_put_contents(NV_ROOTDIR . '/robots.txt', $rbcontents, LOCK_EX);
             $redirect = true;
@@ -74,7 +74,7 @@ if ($nv_Request->isset_request('submit', 'post')) {
             $xtpl->parse('main.nowrite');
         }
     }
-
+    
     if ($redirect) {
         nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op . '&rand=' . nv_genpass());
     }
@@ -118,25 +118,25 @@ foreach ($files as $file) {
         } else {
             $file = '/' . $file;
         }
-
+        
         $data = array(
             'number' => ++$number,
             'filename' => $file
         );
-
+        
         $type = isset($robots_data[$file]) ? $robots_data[$file] : 1;
-
+        
         for ($i = 0; $i <= 2; $i++) {
             $option = array(
                 'value' => $i,
                 'title' => $lang_module['robots_type_' . $i],
                 'selected' => ($type == $i) ? ' selected="selected"' : ''
             );
-
+            
             $xtpl->assign('OPTION', $option);
             $xtpl->parse('main.loop.option');
         }
-
+        
         $xtpl->assign('DATA', $data);
         $xtpl->parse('main.loop');
     }
@@ -147,14 +147,14 @@ foreach ($robots_other as $file => $value) {
         'filename' => $file
     );
     $xtpl->assign('DATA', $data);
-
+    
     for ($i = 0; $i <= 2; $i++) {
         $option = array(
             'value' => $i,
             'title' => $lang_module['robots_type_' . $i],
             'selected' => ($value == $i) ? ' selected="selected"' : ''
         );
-
+        
         $xtpl->assign('OPTION', $option);
         $xtpl->parse('main.other.option');
     }

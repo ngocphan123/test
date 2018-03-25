@@ -8,14 +8,17 @@
  * @Createdate 2-2-2010 12:55
  */
 
-if (! defined('NV_IS_FILE_THEMES')) {
+if (!defined('NV_IS_FILE_THEMES')) {
     die('Stop!!!');
 }
 
 $module = $nv_Request->get_string('module', 'get', '');
 $bid = $nv_Request->get_int('bid', 'get,post', 0);
 
-$row = array( 'theme' => '', 'file_name' => '' );
+$row = array(
+    'theme' => '',
+    'file_name' => ''
+);
 if ($bid > 0) {
     $row = $db->query('SELECT theme, file_name FROM ' . NV_BLOCKS_TABLE . '_groups WHERE bid=' . $bid)->fetch();
 }
@@ -26,7 +29,7 @@ if ($module == 'theme') {
     if (empty($row['theme'])) {
         $row['theme'] = $nv_Request->get_string('selectthemes', 'post,get', $global_config['site_theme']);
     }
-
+    
     $block_file_list = nv_scandir(NV_ROOTDIR . '/themes/' . $row['theme'] . '/blocks', $global_config['check_block_theme']);
     foreach ($block_file_list as $file_name) {
         if (preg_match($global_config['check_block_theme'], $file_name, $matches)) {
@@ -48,15 +51,15 @@ if ($module == 'theme') {
     if (!empty($module_file)) {
         if (file_exists(NV_ROOTDIR . '/modules/' . $module_file . '/blocks')) {
             $block_file_list = nv_scandir(NV_ROOTDIR . '/modules/' . $module_file . '/blocks', $global_config['check_block_module']);
-
+            
             foreach ($block_file_list as $file_name) {
                 $sel = ($file_name == $row['file_name']) ? ' selected="selected"' : '';
-
+                
                 unset($matches);
                 preg_match($global_config['check_block_module'], $file_name, $matches);
-
+                
                 $load_config = (file_exists(NV_ROOTDIR . '/modules/' . $module_file . '/blocks/' . $matches[1] . '.' . $matches[2] . '.ini')) ? 1 : 0;
-
+                
                 echo "<option value=\"" . $file_name . "|" . $load_config . "|\" " . $sel . ">" . $matches[1] . " " . $matches[2] . " </option>\n";
             }
         }

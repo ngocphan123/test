@@ -8,7 +8,7 @@
  * @Createdate Jun 20, 2010 8:59:32 PM
  */
 
-if (! defined('NV_MAINFILE')) {
+if (!defined('NV_MAINFILE')) {
     die('Stop!!!');
 }
 
@@ -24,7 +24,7 @@ function nv_copy_structure_table($table_des, $table_src)
 function nv_delete_table_sys($lang)
 {
     global $db_config;
-
+    
     $sql_drop_table = array();
     $sql_drop_table[] = 'DROP TABLE IF EXISTS ' . $db_config['prefix'] . '_' . $lang . '_modules';
     $sql_drop_table[] = 'DROP TABLE IF EXISTS ' . $db_config['prefix'] . '_' . $lang . '_blocks_groups';
@@ -34,17 +34,17 @@ function nv_delete_table_sys($lang)
     $sql_drop_table[] = 'DROP TABLE IF EXISTS ' . $db_config['prefix'] . '_' . $lang . '_referer_stats';
     $sql_drop_table[] = 'DROP TABLE IF EXISTS ' . $db_config['prefix'] . '_' . $lang . '_modthemes';
     $sql_drop_table[] = 'ALTER TABLE ' . $db_config['prefix'] . '_cronjobs DROP ' . $lang . '_cron_name';
-
+    
     return $sql_drop_table;
 }
 
 function nv_create_table_sys($lang)
 {
     global $db_config, $global_config, $db;
-
+    
     $xml = simplexml_load_file(NV_ROOTDIR . '/themes/' . $global_config['site_theme'] . '/config.ini');
-    $layoutdefault = ( string )$xml->layoutdefault;
-
+    $layoutdefault = (string) $xml->layoutdefault;
+    
     $sql_create_table = array();
     $sql_create_table[] = "CREATE TABLE " . $db_config['prefix'] . "_" . $lang . "_modules (
 		 title varchar(50) NOT NULL,
@@ -71,7 +71,7 @@ function nv_create_table_sys($lang)
 		 gid smallint(5) NOT NULL DEFAULT '0',
 		 PRIMARY KEY (title)
 	) ENGINE=MyISAM";
-
+    
     $sql_create_table[] = "CREATE TABLE " . $db_config['prefix'] . "_" . $lang . "_blocks_groups (
 		 bid mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
 		 theme varchar(55) NOT NULL,
@@ -94,14 +94,14 @@ function nv_create_table_sys($lang)
 		 KEY position (position),
 		 KEY exp_time (exp_time)
 	) ENGINE=MyISAM";
-
+    
     $sql_create_table[] = "CREATE TABLE " . $db_config['prefix'] . "_" . $lang . "_blocks_weight (
 		 bid mediumint(8) NOT NULL DEFAULT '0',
 		 func_id mediumint(8) NOT NULL DEFAULT '0',
 		 weight mediumint(8) NOT NULL DEFAULT '0',
 		 UNIQUE KEY bid (bid,func_id)
 	) ENGINE=MyISAM";
-
+    
     $sql_create_table[] = "CREATE TABLE " . $db_config['prefix'] . "_" . $lang . "_modfuncs (
 		 func_id mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
 		 func_name varchar(55) NOT NULL,
@@ -117,7 +117,7 @@ function nv_create_table_sys($lang)
 		 UNIQUE KEY func_name (func_name,in_module),
 		 UNIQUE KEY alias (alias,in_module)
 	) ENGINE=MyISAM";
-
+    
     $sql_create_table[] = "CREATE TABLE " . $db_config['prefix'] . "_" . $lang . "_searchkeys (
 		 id varchar(32) NOT NULL DEFAULT '',
 		 skey varchar(250) NOT NULL,
@@ -127,7 +127,7 @@ function nv_create_table_sys($lang)
 		 KEY skey (skey),
 		 KEY search_engine (search_engine)
 	) ENGINE=MyISAM";
-
+    
     $sql_create_table[] = "CREATE TABLE " . $db_config['prefix'] . "_" . $lang . "_referer_stats (
 		 host varchar(250) NOT NULL,
 		 total int(11) NOT NULL DEFAULT '0',
@@ -147,14 +147,14 @@ function nv_create_table_sys($lang)
 		 UNIQUE KEY host (host),
 		 KEY total (total)
 	) ENGINE=MyISAM";
-
+    
     $sql_create_table[] = "CREATE TABLE " . $db_config['prefix'] . "_" . $lang . "_modthemes (
 		 func_id mediumint(8) DEFAULT NULL,
 		 layout varchar(100) DEFAULT NULL,
 		 theme varchar(100) DEFAULT NULL,
 		 UNIQUE KEY func_id (func_id,layout,theme)
 	 ) ENGINE=MyISAM";
-
+    
     $sql_create_table[] = "INSERT INTO " . $db_config['prefix'] . "_" . $lang . "_modules (
         title, module_file, module_data, module_upload, module_theme, custom_title, admin_title, set_time, main_file, admin_file,
         theme, mobile, description, keywords, groups_view, weight, act, admins, rss, gid
@@ -174,7 +174,7 @@ function nv_create_table_sys($lang)
  		('siteterms', 'page', 'siteterms', 'siteterms', 'page', 'Siteterms', '', 1517475600, 1, 1, '', '', '', '', '0', 13, 1, '', 1, 0),
  		('freecontent', 'freecontent', 'freecontent', 'freecontent', 'freecontent', 'Free Content', '', 1517475600, 0, 1, '', '', '', '', '0', 14, 1, '', 0, 0),
  		('two-step-verification', 'two-step-verification', 'two_step_verification', 'two-step-verification', 'two_step_verification', 'Two-Step Verification', '', 1517475600, 1, 0, '', '', '', '', '0', 15, 1, '', 0, 0)";
-
+    
     $sql_create_table[] = "INSERT INTO " . NV_CONFIG_GLOBALTABLE . " (lang, module, config_name, config_value) VALUES
 	 	('" . $lang . "', 'global', 'site_domain', ''),
 	 	('" . $lang . "', 'global', 'site_name', 'NukeViet CMS 4.x'),
@@ -195,17 +195,17 @@ function nv_create_table_sys($lang)
 		('" . $lang . "', 'global', 'autologosize2', '40'),
 		('" . $lang . "', 'global', 'autologosize3', '30'),
 		('" . $lang . "', 'global', 'autologomod', ''),
-		('" . $lang . "', 'global', 'name_show', '" . ($lang!='vi' ? 1 : 0) . "'),
+		('" . $lang . "', 'global', 'name_show', '" . ($lang != 'vi' ? 1 : 0) . "'),
 		('" . $lang . "', 'global', 'cronjobs_next_time', '" . NV_CURRENTTIME . "'),
 		('" . $lang . "', 'global', 'disable_site_content', 'For technical reasons Web site temporary not available. we are very sorry for any inconvenience!'),
 		('" . $lang . "', 'seotools', 'prcservice', '')";
-
+    
     $lang_weight = $db->query('SELECT MAX(weight) FROM ' . $db_config['prefix'] . '_setup_language')->fetchColumn() + 1;
-
+    
     $sql_create_table[] = "INSERT INTO " . $db_config['prefix'] . "_setup_language (lang, setup, weight) VALUES('" . $lang . "', 1, " . $lang_weight . ")";
-
+    
     $sql_create_table[] = "INSERT INTO " . $db_config['prefix'] . "_" . $lang . "_modthemes (func_id, layout, theme) VALUES ('0', '" . $layoutdefault . "', '" . $global_config['site_theme'] . "')";
     $sql_create_table[] = "ALTER TABLE " . $db_config['prefix'] . "_cronjobs ADD " . $lang . "_cron_name VARCHAR( 255 ) NOT NULL DEFAULT ''";
-
+    
     return $sql_create_table;
 }

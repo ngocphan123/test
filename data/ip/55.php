@@ -1,3 +1,8 @@
 <?php
 
-$ranges = array(921698304 => array(939524095, 'US'));
+$ranges = array(
+    921698304 => array(
+        939524095,
+        'US'
+    )
+);

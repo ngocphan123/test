@@ -8,7 +8,7 @@
  * @Createdate 12/29/2009 15:33
  */
 
-if (! defined('NV_MAINFILE')) {
+if (!defined('NV_MAINFILE')) {
     die('Stop!!!');
 }
 
@@ -28,12 +28,12 @@ function nv_online_upd()
     } elseif ($client_info['is_bot']) {
         $username = 'bot:' . $client_info['browser']['name'];
     }
-
+    
     $sth = $db->prepare('UPDATE ' . NV_SESSIONS_GLOBALTABLE . ' SET userid = ' . $userid . ', username = :username, onl_time = ' . NV_CURRENTTIME . ' WHERE session_id = :session_id');
     $sth->bindParam(':session_id', $client_info['session_id'], PDO::PARAM_STR);
     $sth->bindParam(':username', $username, PDO::PARAM_STR);
     $sth->execute();
-    if (! $sth->rowCount()) {
+    if (!$sth->rowCount()) {
         try {
             $sth = $db->prepare('INSERT INTO ' . NV_SESSIONS_GLOBALTABLE . ' VALUES ( :session_id, ' . $userid . ', :username, ' . NV_CURRENTTIME . ')');
             $sth->bindParam(':session_id', $client_info['session_id'], PDO::PARAM_STR);

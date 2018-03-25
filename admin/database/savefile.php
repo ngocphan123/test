@@ -8,7 +8,7 @@
  * @Createdate 2-1-2010 21:49
  */
 
-if (! defined('NV_IS_FILE_DATABASE')) {
+if (!defined('NV_IS_FILE_DATABASE')) {
     die('Stop!!!');
 }
 
@@ -18,8 +18,10 @@ $ext = $nv_Request->get_title('ext', 'post', '');
 
 if (empty($tables)) {
     $tables = array();
-} elseif (! is_array($tables)) {
-    $tables = array( $tables );
+} elseif (!is_array($tables)) {
+    $tables = array(
+        $tables
+    );
 }
 
 $tab_list = array();
@@ -44,7 +46,7 @@ if ($global_config['idsite']) {
 }
 $contents['filename'] = $log_dir . '/' . $file_name;
 
-include NV_ROOTDIR . '/includes/core/dump.php' ;
+include NV_ROOTDIR . '/includes/core/dump.php';
 $result = nv_dump_save($contents);
 
 $xtpl = new XTemplate('save.tpl', NV_ROOTDIR . '/themes/' . $global_config['module_theme'] . '/modules/' . $module_file);
@@ -56,9 +58,9 @@ if (empty($result)) {
 } else {
     $file = explode('_', $file_name);
     nv_insert_logs(NV_LANG_DATA, $module_name, $lang_module['savefile'], 'File name: ' . end($file), $admin_info['userid']);
-
+    
     $xtpl->assign('LINK_DOWN', NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=getfile&amp;filename=' . $file_name . '&amp;checkss=' . md5($file_name . NV_CHECK_SESSION));
-
+    
     $xtpl->parse('main.result');
 }
 

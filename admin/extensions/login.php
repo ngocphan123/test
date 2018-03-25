@@ -8,7 +8,7 @@
  * @Createdate 2-1-2010 22:5
  */
 
-if (! defined('NV_IS_FILE_EXTENSIONS')) {
+if (!defined('NV_IS_FILE_EXTENSIONS')) {
     die('Stop!!!');
 }
 
@@ -29,57 +29,57 @@ $xtpl->assign('NV_LANG_DATA', NV_LANG_DATA);
 $xtpl->assign('NV_NAME_VARIABLE', NV_NAME_VARIABLE);
 $xtpl->assign('MODULE_NAME', $module_name);
 
-if (! empty($request['username']) and ! empty($request['password'])) {
+if (!empty($request['username']) and !empty($request['password'])) {
     // Fixed request
     $request['lang'] = NV_LANG_INTERFACE;
     $request['basever'] = $global_config['version'];
     $request['mode'] = 'login';
     $request['domain'] = NV_MY_DOMAIN;
-
+    
     $NV_Http = new NukeViet\Http\Http($global_config, NV_TEMP_DIR);
     $stored_cookies = nv_get_cookies();
-
+    
     // Debug
     $args = array(
         'headers' => array(
-            'Referer' => NUKEVIET_STORE_APIURL,
+            'Referer' => NUKEVIET_STORE_APIURL
         ),
         'cookies' => $stored_cookies,
         'body' => $request
     );
-
+    
     $array = $NV_Http->post(NUKEVIET_STORE_APIURL, $args);
-
+    
     $cookies = $array['cookies'];
-    $array = ! empty($array['body']) ? (is_serialized_string($array['body']) ? unserialize($array['body']) : array()) : array();
-
+    $array = !empty($array['body']) ? (is_serialized_string($array['body']) ? unserialize($array['body']) : array()) : array();
+    
     $error = '';
-    if (! empty(NukeViet\Http\Http::$error)) {
+    if (!empty(NukeViet\Http\Http::$error)) {
         $error = nv_http_get_lang(NukeViet\Http\Http::$error);
-    } elseif (empty($array['status']) or ! isset($array['error']) or ! isset($array['data']) or ! isset($array['pagination']) or ! is_array($array['error']) or ! is_array($array['data']) or ! is_array($array['pagination']) or (! empty($array['error']) and (! isset($array['error']['level']) or empty($array['error']['message'])))) {
+    } elseif (empty($array['status']) or !isset($array['error']) or !isset($array['data']) or !isset($array['pagination']) or !is_array($array['error']) or !is_array($array['data']) or !is_array($array['pagination']) or (!empty($array['error']) and (!isset($array['error']['level']) or empty($array['error']['message'])))) {
         $error = $lang_global['error_valid_response'];
-    } elseif (! empty($array['error']['message'])) {
+    } elseif (!empty($array['error']['message'])) {
         $error = $array['error']['message'];
     }
-
+    
     // Show error
-    if (! empty($error)) {
+    if (!empty($error)) {
         $xtpl->assign('ERROR', $error);
         $xtpl->parse('main.error');
-
+        
         $contents = $xtpl->text('main.error');
     } else {
         // Save cookies
         nv_store_cookies(nv_object2array($cookies), $stored_cookies);
-
+        
         $redirect = $request['redirect'] ? nv_redirect_decrypt($request['redirect']) : NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name;
-
+        
         $xtpl->assign('REDIRECT_LINK', $redirect);
         $xtpl->parse('main.ok');
-
+        
         $contents = $xtpl->text('main.ok');
     }
-
+    
     include NV_ROOTDIR . '/includes/header.php';
     echo $contents;
     include NV_ROOTDIR . '/includes/footer.php';

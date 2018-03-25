@@ -27,37 +27,37 @@ if ($nv_Request->isset_request('notification_get', 'get')) {
     if (!defined('NV_IS_AJAX')) {
         die('Wrong URL');
     }
-
+    
     $last_time_call = $nv_Request->get_int('timestamp', 'get', 0);
     $last_time = 0;
     $count = 0;
     $return = array();
-
+    
     $result = $db->query('SELECT add_time FROM ' . NV_NOTIFICATION_GLOBALTABLE . ' WHERE language="' . NV_LANG_DATA . '" AND area=1 AND view=0 AND module IN(\'' . implode("', '", $allowed_mods) . '\') ORDER BY id DESC');
     $count = $result->rowCount();
     if ($result) {
         $last_time = $result->fetchColumn();
     }
-
+    
     if ($last_time > $last_time_call) {
         $return = array(
             'data_from_file' => $count,
             'timestamp' => $last_time
         );
     }
-
+    
     nv_jsonOutput($return);
 }
 
 // Hide (delete)
 if ($nv_Request->isset_request('delete', 'post')) {
     $id = $nv_Request->get_int('id', 'post', 0);
-
+    
     if ($id) {
         $db->query("DELETE FROM " . NV_NOTIFICATION_GLOBALTABLE . " WHERE id=" . $id . ' AND module IN(\'' . implode("', '", $allowed_mods) . '\')');
         die('OK');
     }
-
+    
     die('ERROR');
 }
 
@@ -87,7 +87,7 @@ while ($data = $result->fetch()) {
     if (isset($admin_mods[$data['module']]) or isset($site_mods[$data['module']])) {
         $mod = $data['module'];
         $data['content'] = !empty($data['content']) ? unserialize($data['content']) : '';
-
+        
         // Hien thi thong bao tu cac module he thong
         if ($data['module'] == 'modules') {
             if ($data['type'] == 'auto_deactive_module') {
@@ -95,7 +95,7 @@ while ($data = $result->fetch()) {
                 $data['link'] = NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $data['module'];
             }
         }
-
+        
         if ($data['module'] == 'settings') {
             if ($data['type'] == 'auto_deactive_cronjobs') {
                 $cron_title = $db->query('SELECT ' . NV_LANG_DATA . '_cron_name FROM ' . $db_config['dbsystem'] . '.' . NV_CRONJOBS_GLOBALTABLE . ' WHERE id=' . $data['content']['cron_id'])->fetchColumn();
@@ -103,7 +103,7 @@ while ($data = $result->fetch()) {
                 $data['link'] = NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $data['module'] . '&amp;' . NV_OP_VARIABLE . '=cronjobs';
             }
         }
-
+        
         // Hien thi tu cac module
         if (file_exists(NV_ROOTDIR . '/modules/' . $site_mods[$data['module']]['module_file'] . '/notification.php')) {
             // Hien thi thong bao tu cac module site
@@ -114,7 +114,7 @@ while ($data = $result->fetch()) {
                 } else {
                     $data['send_from'] = $lang_global['level5'];
                 }
-
+                
                 if (!empty($user_info['photo']) and file_exists(NV_ROOTDIR . '/' . $user_info['photo'])) {
                     $data['photo'] = NV_BASE_SITEURL . $admin_info['photo'];
                 } else {
@@ -124,13 +124,13 @@ while ($data = $result->fetch()) {
                 $data['photo'] = NV_BASE_SITEURL . 'themes/default/images/users/no_avatar.png';
                 $data['send_from'] = $lang_global['level5'];
             }
-
+            
             include NV_ROOTDIR . '/modules/' . $site_mods[$data['module']]['module_file'] . '/notification.php';
         }
-
+        
         $data['add_time_iso'] = nv_date(DATE_ISO8601, $data['add_time']);
         $data['add_time'] = nv_date('H:i d/m/Y', $data['add_time']);
-
+        
         if (!empty($data['title'])) {
             $array_data[$data['id']] = $data;
         }
@@ -145,7 +145,7 @@ if (!empty($array_data)) {
         $xtpl->assign('DATA', $data);
         $xtpl->parse('main.loop');
     }
-
+    
     if ($is_ajax) {
         $contents = $xtpl->text('main.loop');
     } else {
@@ -154,7 +154,7 @@ if (!empty($array_data)) {
             $xtpl->assign('GENERATE_PAGE', $generate_page);
             $xtpl->parse('main.generate_page');
         }
-
+        
         $xtpl->parse('main');
         $contents = $xtpl->text('main');
     }
@@ -164,7 +164,7 @@ if (!empty($array_data)) {
     if ($page != 1) {
         nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op);
     }
-
+    
     $xtpl->parse('empty');
     $contents = $xtpl->text('empty');
 }

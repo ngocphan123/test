@@ -8,7 +8,7 @@
  * @Createdate 11-10-2010 14:43
  */
 
-if (! defined('NV_IS_FILE_SITEINFO')) {
+if (!defined('NV_IS_FILE_SITEINFO')) {
     die('Stop!!!');
 }
 

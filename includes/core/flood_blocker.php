@@ -15,7 +15,7 @@ if (!defined('NV_MAINFILE')) {
 $array_except_flood_site = $array_except_flood_admin = array();
 $ip_exclusion = false;
 if (file_exists(NV_ROOTDIR . '/' . NV_DATADIR . '/efloodip.php')) {
-    include NV_ROOTDIR . '/' . NV_DATADIR . '/efloodip.php' ;
+    include NV_ROOTDIR . '/' . NV_DATADIR . '/efloodip.php';
 }
 
 foreach ($array_except_flood_site as $e => $f) {
@@ -26,11 +26,14 @@ foreach ($array_except_flood_site as $e => $f) {
 }
 
 if (!$ip_exclusion) {
-    $rules = array('60' => $global_config['max_requests_60'], '300' => $global_config['max_requests_300']);
-
+    $rules = array(
+        '60' => $global_config['max_requests_60'],
+        '300' => $global_config['max_requests_300']
+    );
+    
     $flb = new NukeViet\Core\Blocker(NV_ROOTDIR . '/' . NV_LOGS_DIR . '/ip_logs', NV_CLIENT_IP);
     $flb->trackFlood($rules);
-
+    
     if ($flb->is_flooded) {
         include NV_ROOTDIR . '/includes/header.php';
         if (!defined('NV_IS_AJAX') and file_exists(NV_ROOTDIR . '/' . NV_ASSETS_DIR . '/tpl/flood_blocker.tpl')) {
@@ -50,7 +53,7 @@ if (!$ip_exclusion) {
             trigger_error($lang_global['flood_info1'], 256);
         }
     }
-
+    
     unset($rules, $flb);
 }
 

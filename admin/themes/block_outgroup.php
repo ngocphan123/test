@@ -8,7 +8,7 @@
  * @Createdate 2-9-2010 14:43
  */
 
-if (! defined('NV_IS_FILE_THEMES')) {
+if (!defined('NV_IS_FILE_THEMES')) {
     die('Stop!!!');
 }
 
@@ -22,14 +22,14 @@ if ($func_id > 0 and isset($row['bid'])) {
     $sth->bindParam(':theme', $row['theme'], PDO::PARAM_STR);
     $sth->execute();
     $maxweight = $sth->fetchColumn();
-
+    
     $row['weight'] = intval($maxweight) + 1;
-
+    
     try {
         $_sql = 'INSERT INTO ' . NV_BLOCKS_TABLE . '_groups
 			(theme, module, file_name, title, link, template, position, exp_time, active, groups_view, all_func, weight, config) VALUES
 			( :theme, :module, :file_name, :title, :link, :template, :position, ' . $row['exp_time'] . ', :active, :groups_view, 0, ' . $row['weight'] . ', :config )';
-
+        
         $data = array();
         $data['theme'] = $row['theme'];
         $data['module'] = $row['module'];
@@ -41,17 +41,17 @@ if ($func_id > 0 and isset($row['bid'])) {
         $data['active'] = $row['active'];
         $data['groups_view'] = $row['groups_view'];
         $data['config'] = $row['config'];
-
+        
         $new_bid = $db->insert_id($_sql, 'bid', $data);
-
+        
         $db->query('UPDATE ' . NV_BLOCKS_TABLE . '_weight SET bid=' . $new_bid . ' WHERE bid=' . $bid . ' AND func_id=' . $func_id);
-
-        if (! empty($row['all_func'])) {
+        
+        if (!empty($row['all_func'])) {
             $db->query('UPDATE ' . NV_BLOCKS_TABLE . '_groups SET all_func=0 WHERE bid=' . $bid);
         }
-
+        
         $nv_Cache->delMod('themes');
-
+        
         echo $lang_module['block_front_outgroup_success'] . $new_bid;
     } catch (PDOException $e) {
         echo $lang_module['block_front_outgroup_error_update'];

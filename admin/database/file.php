@@ -8,7 +8,7 @@
  * @Createdate 2-1-2010 21:51
  */
 
-if (! defined('NV_IS_FILE_DATABASE')) {
+if (!defined('NV_IS_FILE_DATABASE')) {
     die('Stop!!!');
 }
 
@@ -29,7 +29,7 @@ foreach ($files as $file) {
         $filesize = filesize($log_dir . '/' . $file);
         $filetime = intval(filemtime($log_dir . '/' . $file));
         $array_time[] = $filetime;
-
+        
         $array_content[$filetime] = array(
             'file' => $file,
             'mc' => $mc,
@@ -46,10 +46,10 @@ for ($index = $count; $index >= 0; --$index) {
     $value = $array_content[$filetime];
     $file = $value['file'];
     $mc = $value['mc'];
-
+    
     $link_getfile = NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=getfile&amp;filename=' . $file . '&amp;checkss=' . md5($file . NV_CHECK_SESSION);
     $link_delete = NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=delfile&amp;filename=' . $file . '&amp;checkss=' . md5($file . NV_CHECK_SESSION);
-
+    
     $xtpl->assign('ROW', array(
         'stt' => ++$a,
         'name' => $mc[2] . '.' . $mc[3],
@@ -58,7 +58,7 @@ for ($index = $count; $index >= 0; --$index) {
         'link_getfile' => $link_getfile,
         'link_delete' => $link_delete
     ));
-
+    
     $xtpl->parse('main.loop');
 }
 $xtpl->assign('BACKUPNOW', NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=download&amp;checkss=' . NV_CHECK_SESSION);

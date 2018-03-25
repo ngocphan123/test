@@ -8,7 +8,7 @@
  * @Createdate 2-10-2010 9:32
  */
 
-if (! defined('NV_IS_FILE_MODULES')) {
+if (!defined('NV_IS_FILE_MODULES')) {
     die('Stop!!!');
 }
 

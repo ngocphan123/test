@@ -8,11 +8,15 @@
  * @Createdate 2-2-2010 1:58
  */
 
-if (! defined('NV_ADMIN') or ! defined('NV_MAINFILE') or ! defined('NV_IS_MODADMIN')) {
+if (!defined('NV_ADMIN') or !defined('NV_MAINFILE') or !defined('NV_IS_MODADMIN')) {
     die('Stop!!!');
 }
 
-$allow_func = array( 'main', 'language', 'smtp' );
+$allow_func = array(
+    'main',
+    'language',
+    'smtp'
+);
 if (defined('NV_IS_GODADMIN') or (defined('NV_IS_SPADMIN') and $global_config['idsite'] > 0)) {
     $allow_func[] = 'system';
 }
@@ -58,37 +62,46 @@ $array_url_instruction['variables'] = 'https://wiki.nukeviet.vn/nukeviet4:admin:
 function nv_admin_add_theme($contents)
 {
     global $global_config, $module_file, $my_head, $my_footer;
-
+    
     $xtpl = new XTemplate('cronjobs_add.tpl', NV_ROOTDIR . '/themes/' . $global_config['module_theme'] . '/modules/' . $module_file);
-
+    
     $my_head .= "<link type=\"text/css\" href=\"" . NV_BASE_SITEURL . NV_ASSETS_DIR . "/js/jquery-ui/jquery-ui.min.css\" rel=\"stylesheet\" />\n";
-
+    
     $my_footer .= "<script type=\"text/javascript\" src=\"" . NV_BASE_SITEURL . NV_ASSETS_DIR . "/js/jquery-ui/jquery-ui.min.js\"></script>\n";
     $my_footer .= "<script type=\"text/javascript\" src=\"" . NV_BASE_SITEURL . NV_ASSETS_DIR . "/js/language/jquery.ui.datepicker-" . NV_LANG_INTERFACE . ".js\"></script>\n";
-
+    
     if ($contents['is_error']) {
         $xtpl->parse('main.error');
     }
-
+    
     $xtpl->assign('DATA', $contents);
-
+    
     foreach ($contents['run_file'][2] as $run) {
-        $xtpl->assign('RUN_FILE', array( 'key' => $run, 'selected' => $contents['run_file'][3] == $run ? ' selected="selected"' : '' ));
+        $xtpl->assign('RUN_FILE', array(
+            'key' => $run,
+            'selected' => $contents['run_file'][3] == $run ? ' selected="selected"' : ''
+        ));
         $xtpl->parse('main.run_file');
     }
-
+    
     for ($i = 0; $i < 24; ++$i) {
-        $xtpl->assign('HOUR', array( 'key' => $i, 'selected' => $i == $contents['hour'][1] ? ' selected="selected"' : '' ));
+        $xtpl->assign('HOUR', array(
+            'key' => $i,
+            'selected' => $i == $contents['hour'][1] ? ' selected="selected"' : ''
+        ));
         $xtpl->parse('main.hour');
     }
-
+    
     for ($i = 0; $i < 60; ++$i) {
-        $xtpl->assign('MIN', array( 'key' => $i, 'selected' => $i == $contents['min'][1] ? ' selected="selected"' : '' ));
+        $xtpl->assign('MIN', array(
+            'key' => $i,
+            'selected' => $i == $contents['min'][1] ? ' selected="selected"' : ''
+        ));
         $xtpl->parse('main.min');
     }
-
-    $xtpl->assign('DELETE', ! empty($contents['del'][1]) ? ' checked="checked"' : '');
-
+    
+    $xtpl->assign('DELETE', !empty($contents['del'][1]) ? ' checked="checked"' : '');
+    
     $xtpl->parse('main');
     return $xtpl->text('main');
 }
@@ -104,11 +117,11 @@ function main_theme($contents)
     if (empty($contents)) {
         return '';
     }
-
+    
     global $global_config, $module_file;
-
+    
     $xtpl = new XTemplate('cronjobs_list.tpl', NV_ROOTDIR . '/themes/' . $global_config['module_theme'] . '/modules/' . $module_file);
-
+    
     foreach ($contents as $id => $values) {
         $xtpl->assign('DATA', array(
             'caption' => $values['caption'],
@@ -117,28 +130,28 @@ function main_theme($contents)
             'delete' => empty($values['delete']) ? array() : $values['delete'],
             'id' => $id
         ));
-
-        if (! empty($values['edit'][0])) {
+        
+        if (!empty($values['edit'][0])) {
             $xtpl->parse('main.edit');
         }
-        if (! empty($values['disable'][0])) {
+        if (!empty($values['disable'][0])) {
             $xtpl->parse('main.disable');
         }
-        if (! empty($values['delete'][0])) {
+        if (!empty($values['delete'][0])) {
             $xtpl->parse('main.delete');
         }
-
+        
         foreach ($values['detail'] as $key => $value) {
             $xtpl->assign('ROW', array(
                 'key' => $key,
                 'value' => $value
             ));
-
+            
             $xtpl->parse('main.loop');
         }
-
+        
         $xtpl->parse('main');
     }
-
+    
     return $xtpl->text('main');
 }

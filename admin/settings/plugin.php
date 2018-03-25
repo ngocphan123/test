@@ -32,14 +32,14 @@ if ($nv_Request->isset_request('plugin_file', 'post')) {
             $_sql = 'SELECT max(weight) FROM ' . $db_config['prefix'] . '_plugin WHERE plugin_area=' . $plugin_area;
             $weight = $db->query($_sql)->fetchColumn();
             $weight = intval($weight) + 1;
-
+            
             try {
                 $sth = $db->prepare('INSERT INTO ' . $db_config['prefix'] . '_plugin (plugin_file, plugin_area, weight) VALUES (:plugin_file, :plugin_area, :weight)');
                 $sth->bindParam(':plugin_file', $plugin_file, PDO::PARAM_STR);
                 $sth->bindParam(':plugin_area', $plugin_area, PDO::PARAM_INT);
                 $sth->bindParam(':weight', $weight, PDO::PARAM_INT);
                 $sth->execute();
-
+                
                 nv_save_file_config_global();
             } catch (PDOException $e) {
                 trigger_error($e->getMessage());
@@ -59,7 +59,7 @@ if ($nv_Request->isset_request('dpid', 'get')) {
             while (list ($pid) = $_query->fetch(3)) {
                 $db->query('UPDATE ' . $db_config['prefix'] . '_plugin SET weight = ' . $weight++ . ' WHERE pid=' . $pid);
             }
-
+            
             nv_save_file_config_global();
         }
     }
@@ -69,7 +69,7 @@ if ($nv_Request->isset_request('dpid', 'get')) {
     $row = $db->query('SELECT * FROM ' . $db_config['prefix'] . '_plugin WHERE pid=' . $pid)->fetch();
     if (!empty($row)) {
         $new = $nv_Request->get_int('weight', 'get');
-
+        
         $weight = 0;
         $_query = $db->query('SELECT pid FROM ' . $db_config['prefix'] . '_plugin WHERE plugin_area=' . $row['plugin_area'] . ' AND pid != ' . $pid . ' ORDER BY weight ASC');
         while (list ($pid_i) = $_query->fetch(3)) {
@@ -80,7 +80,7 @@ if ($nv_Request->isset_request('dpid', 'get')) {
             $db->query('UPDATE ' . $db_config['prefix'] . '_plugin SET weight = ' . $weight . ' WHERE pid=' . $pid_i);
         }
         $db->query('UPDATE ' . $db_config['prefix'] . '_plugin SET weight = ' . $new . ' WHERE pid=' . $pid);
-
+        
         nv_save_file_config_global();
     }
     nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op . '&rand=' . nv_genpass());
@@ -138,7 +138,7 @@ if (!empty($plugin_new)) {
         $xtpl->assign('PLUGIN_SELECTED', $_file == $plugin_file ? 'selected="selected"' : '');
         $xtpl->parse('main.add.file');
     }
-
+    
     $array_plugin_position = array();
     if (preg_match($pattern_plugin, $plugin_file, $_m) and nv_is_file(NV_BASE_SITEURL . 'includes/plugin/' . $plugin_file, 'includes/plugin')) {
         if (file_exists(NV_ROOTDIR . '/includes/plugin/' . $_m[1] . '.ini')) {

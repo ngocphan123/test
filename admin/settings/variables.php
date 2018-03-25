@@ -14,34 +14,37 @@ if (!defined('NV_IS_FILE_SETTINGS')) {
 
 $errormess = '';
 if ($nv_Request->isset_request('submit', 'post')) {
-    $preg_replace = array('pattern' => '/[^a-zA-Z0-9\_]/', 'replacement' => '');
-
+    $preg_replace = array(
+        'pattern' => '/[^a-zA-Z0-9\_]/',
+        'replacement' => ''
+    );
+    
     $array_config_global = array();
     $array_config_global['cookie_prefix'] = nv_substr($nv_Request->get_title('cookie_prefix', 'post', '', 0, $preg_replace), 0, 255);
     $array_config_global['session_prefix'] = nv_substr($nv_Request->get_title('session_prefix', 'post', '', 0, $preg_replace), 0, 255);
-    $array_config_global['cookie_secure'] = (int)$nv_Request->get_bool('cookie_secure', 'post', 0);
-    $array_config_global['cookie_httponly'] = (int)$nv_Request->get_bool('cookie_httponly', 'post', 0);
-
+    $array_config_global['cookie_secure'] = (int) $nv_Request->get_bool('cookie_secure', 'post', 0);
+    $array_config_global['cookie_httponly'] = (int) $nv_Request->get_bool('cookie_httponly', 'post', 0);
+    
     $sth = $db->prepare("UPDATE " . NV_CONFIG_GLOBALTABLE . " SET config_value = :config_value WHERE lang = 'sys' AND module = 'global' AND config_name = :config_name");
     foreach ($array_config_global as $config_name => $config_value) {
         $sth->bindParam(':config_name', $config_name, PDO::PARAM_STR, 30);
         $sth->bindParam(':config_value', $config_value, PDO::PARAM_STR);
         $sth->execute();
     }
-
+    
     $array_config_define = array();
     $array_config_define['nv_live_cookie_time'] = 86400 * $nv_Request->get_int('nv_live_cookie_time', 'post', 1);
     $array_config_define['nv_live_session_time'] = 60 * $nv_Request->get_int('nv_live_session_time', 'post', 0);
-
+    
     $sth = $db->prepare("UPDATE " . NV_CONFIG_GLOBALTABLE . " SET config_value = :config_value WHERE lang = 'sys' AND module = 'define' AND config_name = :config_name");
     foreach ($array_config_define as $config_name => $config_value) {
         $sth->bindParam(':config_name', $config_name, PDO::PARAM_STR, 30);
         $sth->bindParam(':config_value', $config_value, PDO::PARAM_STR);
         $sth->execute();
     }
-
+    
     nv_save_file_config_global();
-
+    
     if (empty($errormess)) {
         nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op . '&rand=' . nv_genpass());
     }

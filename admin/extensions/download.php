@@ -8,7 +8,7 @@
  * @Createdate 2-1-2010 22:5
  */
 
-if (! defined('NV_IS_FILE_EXTENSIONS')) {
+if (!defined('NV_IS_FILE_EXTENSIONS')) {
     die('Stop!!!');
 }
 
@@ -31,33 +31,33 @@ $request['lang'] = NV_LANG_INTERFACE;
 $request['basever'] = $global_config['version'];
 $request['mode'] = 'download';
 
-if (empty($request['id']) or empty($request['fid']) or ! isset($array['tid'])) {
+if (empty($request['id']) or empty($request['fid']) or !isset($array['tid'])) {
     $contents = "ERR|" . $lang_module['download_error_preparam'];
 } else {
     $filename = NV_TEMPNAM_PREFIX . 'auto_' . NV_CHECK_SESSION . '.zip';
-
+    
     $NV_Http = new NukeViet\Http\Http($global_config, NV_TEMP_DIR);
-
+    
     $args = array(
         'headers' => array(
-            'Referer' => NUKEVIET_STORE_APIURL,
+            'Referer' => NUKEVIET_STORE_APIURL
         ),
         'stream' => true,
         'filename' => NV_ROOTDIR . '/' . NV_TEMP_DIR . '/' . $filename,
         'body' => $request,
         'timeout' => 0
     );
-
+    
     // Delete temp file if exists
     if (file_exists(NV_ROOTDIR . '/' . NV_TEMP_DIR . '/' . $filename)) {
         @nv_deletefile(NV_ROOTDIR . '/' . NV_TEMP_DIR . '/' . $filename);
     }
-
+    
     $array = $NV_Http->post(NUKEVIET_STORE_APIURL, $args);
-
-    if (! empty(NukeViet\Http\Http::$error)) {
+    
+    if (!empty(NukeViet\Http\Http::$error)) {
         $contents = "ERR|" . nv_http_get_lang(NukeViet\Http\Http::$error);
-    } elseif (empty($array['filename']) or ! file_exists($array['filename']) or filesize($array['filename']) <= 0) {
+    } elseif (empty($array['filename']) or !file_exists($array['filename']) or filesize($array['filename']) <= 0) {
         $contents = "ERR|" . $lang_module['download_error_save'];
     } else {
         $contents = 'OK|' . $filename;

@@ -8,14 +8,14 @@
  * @Createdate 2-10-2010 18:49
  */
 
-if (! defined('NV_IS_FILE_MODULES')) {
+if (!defined('NV_IS_FILE_MODULES')) {
     die('Stop!!!');
 }
 
 $mod = $nv_Request->get_title('mod', 'post', '');
 $new_weight = $nv_Request->get_int('new_weight', 'post', 0);
 
-if (empty($mod) or empty($new_weight) or ! preg_match($global_config['check_module'], $mod)) {
+if (empty($mod) or empty($new_weight) or !preg_match($global_config['check_module'], $mod)) {
     die('NO_' . $mod);
 }
 
@@ -37,7 +37,7 @@ while ($row = $sth->fetch()) {
     if ($weight == $new_weight) {
         ++$weight;
     }
-
+    
     $sth2 = $db->prepare('UPDATE ' . NV_MODULES_TABLE . ' SET weight=' . $weight . ' WHERE title= :title');
     $sth2->bindParam(':title', $row['title'], PDO::PARAM_STR);
     $sth2->execute();

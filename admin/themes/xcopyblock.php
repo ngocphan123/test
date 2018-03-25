@@ -8,7 +8,7 @@
  * @Createdate 08-19-2010 12:55
  */
 
-if (! defined('NV_IS_FILE_THEMES')) {
+if (!defined('NV_IS_FILE_THEMES')) {
     die('Stop!!!');
 }
 
@@ -32,12 +32,15 @@ $xtpl->assign('OP', $op);
 $theme_list = nv_scandir(NV_ROOTDIR . '/themes/', $global_config['check_theme']);
 
 $result = $db->query('SELECT DISTINCT theme FROM ' . NV_PREFIXLANG . '_modthemes WHERE func_id=0');
-while (list($theme) = $result->fetch(3)) {
+while (list ($theme) = $result->fetch(3)) {
     if (in_array($theme, $theme_list)) {
         $xtpl->assign('THEME_FROM', $theme);
         $xtpl->parse('main.theme_from');
-
-        $xtpl->assign('THEME_TO', array( 'key' => $theme, 'selected' => ($selectthemes == $theme and $selectthemes != 'default') ? ' selected="selected"' : '' ));
+        
+        $xtpl->assign('THEME_TO', array(
+            'key' => $theme,
+            'selected' => ($selectthemes == $theme and $selectthemes != 'default') ? ' selected="selected"' : ''
+        ));
         $xtpl->parse('main.theme_to');
     }
 }

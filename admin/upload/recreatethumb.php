@@ -31,10 +31,10 @@ if ($idf < 0) {
     if ($sys_info['allowed_set_time_limit']) {
         set_time_limit(0);
     }
-
+    
     $_dirlist = array();
     $_dirlist = nv_listUploadDir($path, $_dirlist);
-
+    
     // Tìm tất cả các file ảnh có thể tạp ảnh thum để tạo lại
     foreach ($_dirlist as $pathimg) {
         if ($dh = opendir(NV_ROOTDIR . '/' . $pathimg)) {
@@ -61,10 +61,10 @@ if ($idf < 0) {
     if ($sys_info['allowed_set_time_limit']) {
         set_time_limit(0);
     }
-
+    
     include_once NV_ROOTDIR . '/' . NV_TEMP_DIR . '/recreatethumb_' . md5($path . '_' . NV_CHECK_SESSION) . '.php';
     $number_file = sizeof($_array_filename);
-
+    
     // Duyệt mối lần 20 file để tránh : số lượng file quá nhiều bị time out
     $idf_next = $idf + 20;
     if ($idf_next > $number_file) {
@@ -73,7 +73,7 @@ if ($idf < 0) {
     for ($i = $idf; $i < $idf_next; $i++) {
         nv_get_viewImage($_array_filename[$i], 1);
     }
-
+    
     if ($idf < $number_file) {
         nv_htmlOutput('OK_' . $idf_next . '_' . $number_file . '_' . $path);
     } else {

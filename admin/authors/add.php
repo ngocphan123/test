@@ -21,12 +21,12 @@ if ($nv_Request->get_int('result', 'get', 0)) {
     if ($checksess != NV_CHECK_SESSION) {
         nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name);
     }
-
+    
     $session_files = $nv_Request->get_string('nv_admin_profile', 'session', '');
     if (empty($session_files)) {
         nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name);
     }
-
+    
     $session_files = unserialize($session_files);
     $nv_Request->unset_request('nv_admin_profile', 'session');
     nv_admin_add_result($session_files);
@@ -43,7 +43,7 @@ if ($nv_Request->get_int('save', 'post', 0)) {
     $allow_modify_subdirectories = $nv_Request->get_int('allow_modify_subdirectories', 'post', 0);
     $modules = $nv_Request->get_array('modules', 'post', array());
     $position = $nv_Request->get_title('position', 'post', '', 1);
-
+    
     $md5username = nv_md5safe($userid);
     if (preg_match('/^([0-9]+)$/', $userid)) {
         $sql = 'SELECT userid, username, active, group_id, in_groups FROM ' . NV_USERS_GLOBALTABLE . ' WHERE userid=' . intval($userid) . ' OR md5username=' . $db->quote($md5username);
@@ -54,13 +54,13 @@ if ($nv_Request->get_int('save', 'post', 0)) {
     if (empty($userid)) {
         nv_htmlOutput($lang_module['add_error_choose']);
     }
-
+    
     $sql = 'SELECT COUNT(*) FROM ' . NV_AUTHORS_GLOBALTABLE . ' WHERE admin_id=' . $userid;
     $count = $db->query($sql)->fetchColumn();
     if ($count) {
         nv_htmlOutput($lang_module['add_error_exist']);
     }
-
+    
     if (empty($userid)) {
         nv_htmlOutput($lang_module['add_error_notexist']);
     }
@@ -70,7 +70,7 @@ if ($nv_Request->get_int('save', 'post', 0)) {
     if (empty($active)) {
         nv_htmlOutput(sprintf($lang_module['username_noactive'], $username));
     }
-
+    
     $lev = ($lev != 2 or !defined('NV_IS_GODADMIN')) ? 3 : 2;
     $mds = array();
     if ($lev == 3 and !empty($modules)) {
@@ -89,27 +89,27 @@ if ($nv_Request->get_int('save', 'post', 0)) {
                 $update .= 'WHEN title = ' . $titles[$i] . ' THEN ' . $db->quote($site_mods_admins) . ' ';
             }
         }
-
+        
         if (!empty($titles)) {
             $update .= 'END WHERE title IN (' . implode(',', $titles) . ')';
             $db->query($update);
             $nv_Cache->delMod('modules');
         }
     }
-
+    
     $allow_files_type = array_values(array_intersect($global_config['file_allowed_ext'], $allow_files_type));
     $files_level = (!empty($allow_files_type) ? implode(',', $allow_files_type) : '') . '|' . $allow_modify_files . '|' . $allow_create_subdirectories . '|' . $allow_modify_subdirectories;
-
+    
     $sth = $db->prepare("INSERT INTO " . NV_AUTHORS_GLOBALTABLE . "
 		(admin_id, editor, lev, files_level, position, is_suspend, susp_reason, check_num, last_login, last_ip, last_agent) VALUES
 		( " . $userid . ", :editor, " . $lev . ", :files_level, :position, 0,'', '', 0, '', ''	)");
     $sth->bindParam(':editor', $editor, PDO::PARAM_STR);
     $sth->bindParam(':files_level', $files_level, PDO::PARAM_STR);
     $sth->bindParam(':position', $position, PDO::PARAM_STR);
-
+    
     if ($sth->execute()) {
         nv_groups_add_user($lev, $userid);
-
+        
         //Nếu là thành viên mới, thì xóa khỏi nhóm thành viên mới
         if ($_group_id == 7 or in_array(7, explode(',', $_in_groups))) {
             if ($_group_id == 7) {
@@ -118,12 +118,12 @@ if ($nv_Request->get_int('save', 'post', 0)) {
             $_in_groups = array_diff($_in_groups, array(
                 7
             ));
-
+            
             $db->query('UPDATE ' . NV_USERS_GLOBALTABLE . ' SET group_id = ' . $_group_id . ", in_groups='" . implode(',', $_in_groups) . "' WHERE userid = " . $userid);
             $db->query('UPDATE ' . NV_USERS_GLOBALTABLE . '_groups SET numbers = numbers-1 WHERE group_id=7');
             $db->query('UPDATE ' . NV_USERS_GLOBALTABLE . '_groups SET numbers = numbers+1 WHERE group_id=4');
         }
-
+        
         $result = array(
             'admin_id' => $userid,
             'editor' => $editor,
@@ -135,10 +135,10 @@ if ($nv_Request->get_int('save', 'post', 0)) {
             'position' => $position,
             'modules' => (!empty($mds)) ? implode(', ', $mds) : ''
         );
-
+        
         $session_files = serialize($result);
         $nv_Request->set_Session('nv_admin_profile', $session_files);
-
+        
         nv_insert_logs(NV_LANG_DATA, $module_name, $lang_module['menuadd'], 'Username: ' . $username, $admin_info['userid']);
         nv_htmlOutput('OK');
     } else {

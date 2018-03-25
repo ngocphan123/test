@@ -8,7 +8,7 @@
  * @Createdate 16-12-2012 15:48
  */
 
-if (! defined('NV_IS_FILE_AUTHORS')) {
+if (!defined('NV_IS_FILE_AUTHORS')) {
     die('Stop!!!');
 }
 
@@ -16,7 +16,7 @@ if (defined('NV_IS_AJAX')) {
     if ($nv_Request->isset_request('changeweight', 'post')) {
         $mid = $nv_Request->get_int('changeweight', 'post', 0);
         $new_vid = $nv_Request->get_int('new_vid', 'post', 0);
-
+        
         $query = 'SELECT mid FROM ' . NV_AUTHORS_GLOBALTABLE . '_module WHERE mid!=' . $mid . ' ORDER BY weight ASC';
         $result = $db->query($query);
         $weight = 0;
@@ -40,7 +40,7 @@ if (defined('NV_IS_AJAX')) {
             } elseif ($act == 1 and ($row['module'] == 'authors' or $row['module'] == 'siteinfo')) {
                 $save = false;
             }
-
+            
             if ($save) {
                 $act_val = ($row['act_' . $act]) ? 0 : 1;
                 $checksum = md5($row['module'] . '#' . $row['act_1'] . '#' . $row['act_2'] . '#' . $row['act_3'] . '#' . $global_config['sitekey']);
@@ -66,9 +66,12 @@ $a = 0;
 $rows = $db->query('SELECT * FROM ' . NV_AUTHORS_GLOBALTABLE . '_module ORDER BY weight ASC')->fetchAll();
 $numrows = sizeof($rows);
 foreach ($rows as $row) {
-	if ($row['module'] == 'siteinfo') continue;
+    if ($row['module'] == 'siteinfo') continue;
     for ($i = 1; $i <= $numrows; $i++) {
-        $xtpl->assign('WEIGHT', array( 'key' => $i, 'selected' => ($i == $row['weight']) ? ' selected="selected"' : '' ));
+        $xtpl->assign('WEIGHT', array(
+            'key' => $i,
+            'selected' => ($i == $row['weight']) ? ' selected="selected"' : ''
+        ));
         $xtpl->parse('main.loop.weight');
     }
     $row['custom_title'] = isset($lang_global[$row['lang_key']]) ? $lang_global[$row['lang_key']] : '';
@@ -77,20 +80,20 @@ foreach ($rows as $row) {
         $chang_act[$i] = ($row['act_' . $i]) ? ' checked="checked"' : '';
         if ($i == 3 and ($row['module'] == 'database' or $row['module'] == 'settings' or $row['module'] == 'site')) {
             $chang_act[$i] .= ' disabled="disabled"';
-        } elseif ($i == 1  and $row['module'] == 'authors') {
+        } elseif ($i == 1 and $row['module'] == 'authors') {
             $chang_act[$i] .= ' disabled="disabled"';
         }
     }
     $xtpl->assign('ROW', $row);
     $xtpl->assign('CHANG_ACT', $chang_act);
-
+    
     $xtpl->parse('main.loop');
 }
 
 $xtpl->parse('main');
 $contents = $xtpl->text('main');
 
-if (! defined('NV_IS_AJAX')) {
+if (!defined('NV_IS_AJAX')) {
     $page_title = $lang_module['module_admin'];
     $contents = nv_admin_theme($contents);
 }

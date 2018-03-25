@@ -21,6 +21,6 @@ function cron_online_expired_del()
 {
     global $db;
     $db->query('DELETE FROM ' . NV_SESSIONS_GLOBALTABLE . ' WHERE onl_time < ' . (NV_CURRENTTIME - NV_ONLINE_UPD_TIME));
-
+    
     return true;
 }

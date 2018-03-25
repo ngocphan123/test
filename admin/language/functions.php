@@ -8,7 +8,7 @@
  * @Createdate 2-2-2010 1:58
  */
 
-if (! defined('NV_ADMIN') or ! defined('NV_MAINFILE') or ! defined('NV_IS_MODADMIN')) {
+if (!defined('NV_ADMIN') or !defined('NV_MAINFILE') or !defined('NV_IS_MODADMIN')) {
     die('Stop!!!');
 }
 
@@ -21,7 +21,9 @@ $menu_top = array(
     'custom_title' => $lang_global['mod_language']
 );
 
-$allow_func = array( 'main' );
+$allow_func = array(
+    'main'
+);
 if (empty($global_config['idsite'])) {
     $allow_func[] = 'read';
     $allow_func[] = 'copy';
@@ -37,7 +39,7 @@ if (empty($global_config['idsite'])) {
     }
 }
 
-if (! isset($global_config['site_description'])) {
+if (!isset($global_config['site_description'])) {
     $global_config['site_description'] = '';
     $global_config['cronjobs_next_time'] = NV_CURRENTTIME;
 }
@@ -68,10 +70,10 @@ $dirlang = $nv_Request->get_title('dirlang', 'get', '');
 function nv_admin_add_field_lang($dirlang)
 {
     global $db, $language_array;
-
-    if (isset($language_array[$dirlang]) and ! empty($language_array[$dirlang])) {
+    
+    if (isset($language_array[$dirlang]) and !empty($language_array[$dirlang])) {
         $add_field = true;
-
+        
         $columns_array = $db->columns_array(NV_LANGUAGE_GLOBALTABLE . '_file');
         foreach ($columns_array as $row) {
             if ($row['field'] == 'author_' . $dirlang) {
@@ -79,7 +81,7 @@ function nv_admin_add_field_lang($dirlang)
                 break;
             }
         }
-
+        
         if ($add_field == true) {
             $db->columns_add(NV_LANGUAGE_GLOBALTABLE, 'lang_' . $dirlang, 'string', 4000, true);
             $db->columns_add(NV_LANGUAGE_GLOBALTABLE, 'update_' . $dirlang, 'integer', 2147483647, true, 0);
@@ -97,22 +99,22 @@ function nv_admin_add_field_lang($dirlang)
 function nv_update_config_allow_sitelangs($allow_sitelangs = array())
 {
     global $global_config, $db_config, $db;
-
+    
     if (defined('NV_IS_GODADMIN') or ($global_config['idsite'] > 0 and defined('NV_IS_SPADMIN'))) {
         if (empty($allow_sitelangs)) {
             $allow_sitelangs = $global_config['allow_sitelangs'];
         }
-
+        
         $sql = 'SELECT lang FROM ' . $db_config['prefix'] . '_setup_language ORDER BY weight ASC';
         $result = $db->query($sql);
-
+        
         $sitelangs = array();
         while ($row = $result->fetch()) {
             if (in_array($row['lang'], $allow_sitelangs)) {
                 $sitelangs[] = $row['lang'];
             }
         }
-
+        
         $sth = $db->prepare("UPDATE " . NV_CONFIG_GLOBALTABLE . " SET config_value = :config_value WHERE lang='sys' AND module = 'global' AND config_name = 'allow_sitelangs'");
         $sth->bindValue(':config_value', implode(',', $sitelangs), PDO::PARAM_STR);
         $sth->execute();

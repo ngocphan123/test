@@ -34,7 +34,7 @@ if ((($client_info['is_mobile'] and (empty($global_config['current_theme_type'])
     if (empty($global_config['current_theme_type']) and ($client_info['is_mobile'] or empty($_theme_mobile))) {
         $global_config['current_theme_type'] = 'r';
     }
-
+    
     $_theme = $global_config['site_theme'];
     if (!empty($_theme) and file_exists(NV_ROOTDIR . '/themes/' . $_theme . '/theme.php')) {
         $site_theme = $_theme;

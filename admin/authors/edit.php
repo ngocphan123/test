@@ -69,7 +69,7 @@ $error = '';
 
 if ($nv_Request->get_int('save', 'post', 0)) {
     nv_insert_logs(NV_LANG_DATA, $module_name, $lang_module['nv_admin_edit'], 'Username: ' . $row_user['username'], $admin_info['userid']);
-
+    
     $editor = $nv_Request->get_title('editor', 'post', '');
     if (defined('NV_IS_SPADMIN')) {
         $allow_files_type = $nv_Request->get_array('allow_files_type', 'post', array());
@@ -82,33 +82,33 @@ if ($nv_Request->get_int('save', 'post', 0)) {
         $allow_create_subdirectories = $old_allow_create_subdirectories;
         $allow_modify_subdirectories = $old_allow_modify_subdirectories;
     }
-
+    
     $lev = ((defined('NV_IS_SPADMIN') and $admin_info['level'] == 1) and $row['admin_id'] != $admin_info['admin_id']) ? $nv_Request->get_int('lev', 'post', 0) : $row['lev'];
     $modules = (defined('NV_IS_SPADMIN') and $row['admin_id'] != $admin_info['admin_id']) ? $nv_Request->get_array('modules', 'post', array()) : $old_modules;
     $position = ((defined('NV_IS_SPADMIN') and $admin_info['level'] == 1) or (defined('NV_IS_SPADMIN') and $row['lev'] != 1 and $row['admin_id'] != $admin_info['admin_id'])) ? $nv_Request->get_title('position', 'post') : $row['position'];
     $main_module = $nv_Request->get_title('main_module', 'post', 'siteinfo');
-
+    
     if ($lev == 2) {
         $modules = array();
     }
-
+    
     if (!empty($modules)) {
         $modules = array_intersect(array_keys($site_mods), $modules);
     }
-
+    
     if (empty($position)) {
         $error = $lang_module['position_incorrect'];
     } else {
         $add_modules = array_diff($modules, $old_modules);
         $del_modules = array_diff($old_modules, $modules);
-
+        
         if (!empty($add_modules)) {
             foreach ($add_modules as $mod) {
                 $admins = (!empty($site_mods[$mod]['admins'])) ? explode(',', $site_mods[$mod]['admins']) : array();
                 array_push($admins, $admin_id);
                 $admins = array_map('intval', $admins);
                 $admins = (!empty($admins)) ? implode(',', $admins) : '';
-
+                
                 $sth = $db->prepare('UPDATE ' . NV_MODULES_TABLE . ' SET admins= :admins WHERE title= :mod');
                 $sth->bindParam(':admins', $admins, PDO::PARAM_STR);
                 $sth->bindParam(':mod', $mod, PDO::PARAM_STR);
@@ -124,33 +124,33 @@ if ($nv_Request->get_int('save', 'post', 0)) {
                 ));
                 $admins = array_map('intval', $admins);
                 $admins = (!empty($admins)) ? implode(',', $admins) : '';
-
+                
                 $sth = $db->prepare('UPDATE ' . NV_MODULES_TABLE . ' SET admins= :admins WHERE title= :mod');
                 $sth->bindParam(':admins', $admins, PDO::PARAM_STR);
                 $sth->bindParam(':mod', $mod, PDO::PARAM_STR);
                 $sth->execute();
             }
         }
-
+        
         if (!empty($add_modules) or !empty($del_modules)) {
             $nv_Cache->delMod('modules');
         }
-
+        
         $allow_files_type = array_values(array_intersect($global_config['file_allowed_ext'], $allow_files_type));
         $files_level = (!empty($allow_files_type) ? implode(',', $allow_files_type) : '') . '|' . $allow_modify_files . '|' . $allow_create_subdirectories . '|' . $allow_modify_subdirectories;
-
+        
         $sth = $db->prepare('UPDATE ' . NV_AUTHORS_GLOBALTABLE . ' SET editor = :editor, lev=' . $lev . ', files_level= :files_level, position= :position, main_module = :main_module WHERE admin_id=' . $admin_id);
         $sth->bindParam(':editor', $editor, PDO::PARAM_STR);
         $sth->bindParam(':files_level', $files_level, PDO::PARAM_STR);
         $sth->bindParam(':position', $position, PDO::PARAM_STR);
         $sth->bindParam(':main_module', $main_module, PDO::PARAM_STR);
         $sth->execute();
-
+        
         if ($lev != $row['lev']) {
             nv_groups_add_user($lev, $admin_id);
             nv_groups_del_user($row['lev'], $admin_id);
         }
-
+        
         $result = array();
         $result['admin_id'] = $admin_id;
         $result['login'] = $row_user['username'];
@@ -216,7 +216,7 @@ if ($nv_Request->get_int('save', 'post', 0)) {
                 }
             }
             $new = (!empty($new)) ? implode(', ', $new) : '';
-
+            
             $result['change']['modules'] = array(
                 $lang_module['nv_admin_modules'],
                 $old,
@@ -252,7 +252,7 @@ if ($nv_Request->get_int('save', 'post', 0)) {
                 $position
             );
         }
-
+        
         if (empty($result['change'])) {
             nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '#aid' . $admin_id);
         }
@@ -283,13 +283,13 @@ if (defined('NV_IS_SPADMIN') and $row['admin_id'] != $admin_info['admin_id']) {
         $mods[$mod]['checked'] = in_array($mod, $modules) ? 1 : 0;
         $mods[$mod]['custom_title'] = $site_mods[$mod]['custom_title'];
     }
-
+    
     $contents['lev'] = array(
         $lang_module['lev'],
         $lang_module['if_level3_selected'],
         $mods
     );
-
+    
     if (defined('NV_IS_SPADMIN') and $admin_info['level'] == 1) {
         array_push($contents['lev'], $lev, $lang_global['level2'], $lang_global['level3']);
     }
@@ -329,7 +329,7 @@ if (defined('NV_IS_SPADMIN')) {
             $allow_files_type
         );
     }
-
+    
     $contents['allow_modify_files'] = array(
         $lang_module['allow_modify_files'],
         $allow_modify_files
@@ -395,7 +395,7 @@ if (isset($contents['editor'])) {
 
 if (isset($contents['allow_files_type'])) {
     $xtpl->assign('ALLOW_FILES_TYPE', $contents['allow_files_type'][0]);
-
+    
     foreach ($contents['allow_files_type'][1] as $tp) {
         $xtpl->assign('VALUE', $tp);
         $xtpl->assign('CHECKED', in_array($tp, $contents['allow_files_type'][2]) ? ' checked="checked"' : '');
@@ -425,7 +425,7 @@ if (isset($contents['allow_modify_subdirectories'])) {
 if (isset($contents['lev'])) {
     $xtpl->assign('LEV0', $contents['lev'][0]);
     $xtpl->assign('LEV1', $contents['lev'][1]);
-
+    
     if (isset($contents['lev'][3])) {
         $xtpl->assign('LEV4', $contents['lev'][4]);
         $xtpl->assign('LEV5', $contents['lev'][5]);

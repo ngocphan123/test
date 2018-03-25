@@ -49,19 +49,19 @@ $array_url_instruction['sampledata'] = 'https://wiki.nukeviet.vn/nukeviet4:admin
 function nv_show_tables()
 {
     global $db, $db_config, $lang_module, $module_name;
-
+    
     $tables = array();
-
+    
     $db_size = 0;
     $db_totalfree = 0;
     $db_tables_count = 0;
-
+    
     $tables = array();
-
+    
     $result = $db->query("SHOW TABLE STATUS LIKE '" . $db_config['prefix'] . "\_%'");
     while ($item = $result->fetch()) {
         $tables_size = floatval($item['data_length']) + floatval($item['index_length']);
-
+        
         if ($item['engine'] != 'MyISAM') {
             if ($item['rows'] < 100000) {
                 $item['rows'] = $db->query("SELECT COUNT(*) FROM " . $item['name'])->fetchColumn();
@@ -86,19 +86,19 @@ function nv_show_tables()
         ++$db_tables_count;
     }
     $result->closeCursor();
-
+    
     $db_size = !empty($db_size) ? nv_convertfromBytes($db_size) : 0;
     $db_totalfree = !empty($db_totalfree) ? nv_convertfromBytes($db_totalfree) : 0;
-
+    
     $contents = array();
     $contents['action'] = NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name;
-
+    
     $contents['op'] = array(
         'download' => $lang_module['download'],
         'savefile' => $lang_module['savefile'],
         'optimize' => $lang_module['optimize']
     );
-
+    
     $contents['op_name'] = NV_OP_VARIABLE;
     $contents['type'] = array(
         'all' => $lang_module['download_all'],
@@ -112,7 +112,7 @@ function nv_show_tables()
     $contents['ext_name'] = 'ext';
     $contents['submit'] = $lang_module['submit'];
     $contents['captions']['tables_info'] = sprintf($lang_module['tables_info'], $db->dbname);
-
+    
     $contents['columns'] = array(
         $lang_module['table_name'],
         $lang_module['table_size'],
@@ -125,17 +125,17 @@ function nv_show_tables()
         $lang_module['table_create_time'],
         $lang_module['table_update_time']
     );
-
+    
     foreach ($tables as $key => $values) {
         $table_name = substr($key, strlen($db_config['prefix']) + 1);
         array_unshift($values, '<a href="' . NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;tab=' . $key . '">' . $table_name . '</a>');
         $contents['rows'][$key] = $values;
     }
-
+    
     $contents['third'] = sprintf($lang_module['third'], $db_tables_count, $db_size, $db_totalfree);
-
+    
     $contents = nv_show_tables_theme($contents);
-
+    
     include NV_ROOTDIR . '/includes/header.php';
     echo $contents;
     include NV_ROOTDIR . '/includes/footer.php';
@@ -151,12 +151,12 @@ function nv_show_tables()
 function nv_highlight_string($tab, $type = 'sql')
 {
     global $db;
-
+    
     $db->query('SET SQL_QUOTE_SHOW_CREATE = 1');
     $show = $db->query('SHOW CREATE TABLE ' . $tab)->fetchColumn(1);
     $show = preg_replace('/(KEY[^\(]+)(\([^\)]+\))[\s\r\n\t]+(USING BTREE)/i', '\\1\\3 \\2', $show);
     $show = preg_replace('/(default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP|DEFAULT CHARSET=\w+|COLLATE=\w+|character set \w+|collate \w+|AUTO_INCREMENT=\w+)/i', ' \\1', $show);
-
+    
     if ($type == 'sql') {
         return highlight_string($show . ';', 1);
     } else {
@@ -172,18 +172,18 @@ function nv_highlight_string($tab, $type = 'sql')
 function nv_show_tab()
 {
     global $db, $db_config, $module_name, $page_title, $lang_module, $nv_Request;
-
+    
     $tab = $nv_Request->get_title('tab', 'get');
-
+    
     $sth = $db->prepare('SHOW TABLE STATUS WHERE name= :tab');
     $sth->bindParam(':tab', $tab, PDO::PARAM_STR);
     $sth->execute();
     $item = $sth->fetch();
-
+    
     if (empty($item)) {
         nv_redirect_location(NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name);
     }
-
+    
     if (in_array($nv_Request->get_title('show_highlight', 'post'), array(
         'php',
         'sql'
@@ -193,11 +193,11 @@ function nv_show_tab()
         echo $content;
         include NV_ROOTDIR . '/includes/footer.php';
     }
-
+    
     if ($item['engine'] != 'MyISAM') {
         $item['rows'] = $db->query("SELECT COUNT(*) FROM " . $item['name'])->fetchColumn();
     }
-
+    
     $tablename = substr($item['name'], strlen($db_config['prefix']) + 1);
     $contents = array();
     $contents['table']['caption'] = sprintf($lang_module['table_caption'], $tablename);
@@ -249,13 +249,13 @@ function nv_show_tab()
         $lang_module['table_charset'],
         ((!empty($item['collation']) and preg_match('/^([a-z0-9]+)_/i', $item['collation'], $m)) ? $m[1] : '')
     );
-
+    
     $contents['table']['show'] = nv_highlight_string($tab, 'php');
     $contents['table']['show_lang'] = array(
         $lang_module['php_code'],
         $lang_module['sql_code']
     );
-
+    
     $contents['table']['row']['caption'] = sprintf($lang_module['table_row_caption'], $tablename);
     $contents['table']['row']['columns'] = array(
         $lang_module['field_name'],
@@ -265,7 +265,7 @@ function nv_show_tab()
         $lang_module['field_default'],
         $lang_module['field_extra']
     );
-
+    
     $contents['table']['row']['detail'] = array();
     $columns_array = $db->columns_array($tab);
     foreach ($columns_array as $row) {
@@ -273,11 +273,11 @@ function nv_show_tab()
         $row['key'] = empty($row['key']) ? '' : ($row['key'] == 'PRI' ? 'PRIMARY KEY' : ($row['key'] == 'UNI' ? 'UNIQUE KEY' : 'KEY'));
         $contents['table']['row']['detail'][] = $row;
     }
-
+    
     $contents = nv_show_tab_theme($contents);
-
+    
     $page_title = sprintf($lang_module['nv_show_tab'], $tablename);
-
+    
     include NV_ROOTDIR . '/includes/header.php';
     echo nv_admin_theme($contents);
     include NV_ROOTDIR . '/includes/footer.php';
@@ -292,10 +292,10 @@ function nv_show_tab()
 function main_theme($contents)
 {
     global $global_config, $module_file;
-
+    
     $xtpl = new XTemplate('main.tpl', NV_ROOTDIR . '/themes/' . $global_config['module_theme'] . '/modules/' . $module_file);
     $xtpl->assign('CAPTION', $contents['captions']['database_info']);
-
+    
     foreach ($contents['database'] as $key => $value) {
         $xtpl->assign('ROW', array(
             'key' => $key,
@@ -303,7 +303,7 @@ function main_theme($contents)
         ));
         $xtpl->parse('main.loop');
     }
-
+    
     $xtpl->parse('main');
     return $xtpl->text('main');
 }
@@ -317,60 +317,60 @@ function main_theme($contents)
 function nv_show_tables_theme($contents)
 {
     global $global_config, $module_file;
-
+    
     $xtpl = new XTemplate('tables.tpl', NV_ROOTDIR . '/themes/' . $global_config['module_theme'] . '/modules/' . $module_file);
-
+    
     $xtpl->assign('ACTION', $contents['action']);
     $xtpl->assign('CAPTIONS', $contents['captions']['tables_info']);
-
+    
     foreach ($contents['columns'] as $value) {
         $xtpl->assign('COLNAME', $value);
         $xtpl->parse('main.columns');
     }
-
+    
     $xtpl->assign('OP_NAME', $contents['op_name']);
-
+    
     foreach ($contents['op'] as $key => $val) {
         $xtpl->assign('KEY', $key);
         $xtpl->assign('VAL', $val);
         $xtpl->parse('main.op');
     }
-
+    
     $xtpl->assign('TYPE_NAME', $contents['type_name']);
-
+    
     foreach ($contents['type'] as $key => $val) {
         $xtpl->assign('KEY', $key);
         $xtpl->assign('VAL', $val);
         $xtpl->parse('main.type');
     }
-
+    
     $xtpl->assign('EXT_NAME', $contents['ext_name']);
-
+    
     foreach ($contents['ext'] as $key => $val) {
         $xtpl->assign('SELECTED', ($key == $global_config['dump_backup_ext']) ? 'selected="selected"' : '');
         $xtpl->assign('KEY', $key);
         $xtpl->assign('VAL', $val);
         $xtpl->parse('main.ext');
     }
-
+    
     $xtpl->assign('SUBMIT', $contents['submit']);
-
+    
     foreach ($contents['rows'] as $key => $values) {
         $xtpl->assign('ROW', array(
             'tag' => (empty($values[3])) ? 'td' : 'th',
             'key' => $key
         ));
-
+        
         foreach ($values as $value) {
             $xtpl->assign('VALUE', $value);
             $xtpl->parse('main.loop.col');
         }
-
+        
         $xtpl->parse('main.loop');
     }
-
+    
     $xtpl->assign('THIRD', $contents['third']);
-
+    
     $xtpl->parse('main');
     return $xtpl->text('main');
 }
@@ -384,37 +384,37 @@ function nv_show_tables_theme($contents)
 function nv_show_tab_theme($contents)
 {
     global $global_config, $module_file;
-
+    
     $xtpl = new XTemplate('tabs.tpl', NV_ROOTDIR . '/themes/' . $global_config['module_theme'] . '/modules/' . $module_file);
-
+    
     $xtpl->assign('CAPTION', $contents['table']['caption']);
-
+    
     $a = 0;
     foreach ($contents['table']['info'] as $key => $value) {
         $xtpl->assign('INFO', $value);
         $xtpl->parse('main.info');
     }
-
+    
     $xtpl->assign('SHOW_LANG', $contents['table']['show_lang']);
     $xtpl->assign('SHOW', $contents['table']['show']);
-
+    
     $xtpl->assign('RCAPTION', $contents['table']['row']['caption']);
-
+    
     foreach ($contents['table']['row']['columns'] as $value) {
         $xtpl->assign('VALUE', $value);
         $xtpl->parse('main.column');
     }
-
+    
     $a = 0;
     foreach ($contents['table']['row']['detail'] as $key => $values) {
         foreach ($values as $value) {
             $xtpl->assign('VAL', $value);
             $xtpl->parse('main.detail.loop');
         }
-
+        
         $xtpl->parse('main.detail');
     }
-
+    
     $xtpl->parse('main');
     return $xtpl->text('main');
 }

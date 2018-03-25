@@ -8,7 +8,7 @@
  * @Createdate 3/7/2010 2:9
  */
 
-if (! defined('NV_IS_FILE_MODULES')) {
+if (!defined('NV_IS_FILE_MODULES')) {
     die('Stop!!!');
 }
 
@@ -36,11 +36,11 @@ $sth->execute();
 $weight = 0;
 while ($row = $sth->fetch()) {
     ++$weight;
-
+    
     if ($weight == $new_weight) {
         ++$weight;
     }
-
+    
     $db->query('UPDATE ' . NV_MODFUNCS_TABLE . ' SET subweight=' . $weight . ' WHERE func_id=' . $row['func_id']);
 }
 

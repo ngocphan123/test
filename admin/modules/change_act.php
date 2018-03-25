@@ -8,13 +8,13 @@
  * @Createdate 2-10-2010 19:49
  */
 
-if (! defined('NV_IS_FILE_MODULES')) {
+if (!defined('NV_IS_FILE_MODULES')) {
     die('Stop!!!');
 }
 
 $mod = $nv_Request->get_title('mod', 'post');
 
-if (empty($mod) or ! preg_match($global_config['check_module'], $mod)) {
+if (empty($mod) or !preg_match($global_config['check_module'], $mod)) {
     die('NO_' . $mod);
 }
 
@@ -29,7 +29,7 @@ if (empty($row)) {
 $act = intval($row['act']);
 
 if ($act == 2) {
-    if (! is_dir(NV_ROOTDIR . '/modules/' . $row['module_file'])) {
+    if (!is_dir(NV_ROOTDIR . '/modules/' . $row['module_file'])) {
         die('NO_' . $mod);
     }
 }
